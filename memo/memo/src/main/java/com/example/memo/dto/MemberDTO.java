@@ -1,10 +1,8 @@
 package com.example.memo.dto;
 
 import com.example.memo.entity.MemberEntity;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+
 //DTO:데이터 전송 객체(Data Transfer Object), 프로젝트 간에 데이터를 전달하는 객체(단순히 데이터 전달 목적)
 @Getter
 @Setter
