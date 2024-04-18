@@ -6,3 +6,6 @@ spring:
     password: 1234
   thymeleaf:
     cache: false
+
+
+secret-key: ThisStatementIsJwtSecretKeyDoNotUseThisStatement;

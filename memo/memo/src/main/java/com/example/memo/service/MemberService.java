@@ -1,5 +1,7 @@
+
 package com.example.memo.service;
 
+/*
 import com.example.memo.dto.MemberDTO;
 import com.example.memo.entity.MemberEntity;
 import com.example.memo.repository.MemberRepository;
@@ -37,3 +39,5 @@ public class MemberService {
         }
     }
 }
+
+*/
