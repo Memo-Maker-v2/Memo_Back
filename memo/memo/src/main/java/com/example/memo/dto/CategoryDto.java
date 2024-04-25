@@ -17,6 +17,5 @@ public class CategoryDto {
     @NotBlank
     private String categoryName;
 
-    @NotBlank
     private long categorySequence;
 }
