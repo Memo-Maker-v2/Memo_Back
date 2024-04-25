@@ -11,6 +11,8 @@ import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class OAuth2UserServiceImplement extends DefaultOAuth2UserService {
@@ -25,15 +27,13 @@ public class OAuth2UserServiceImplement extends DefaultOAuth2UserService {
             exception.printStackTrace();
         }
         MemberEntity memberEntity=null;
-//        Map<String,Object> kakao_account =(Map<String,Object>) oAuth2User.getAttributes().get("kakao_account");
-//        Map<String,Object> profile =(Map<String,Object>) kakao_account.get("profile");
+        Map<String, Object> kakao_account = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
+        Map<String, Object> profile = (Map<String, Object>) kakao_account.get("profile");
         String userId="kakao_"+oAuth2User.getAttributes().get("id");
-//        String email="kakao_"+oAuth2User.getAttributes().get("email");
-//        String name="kakao_"+oAuth2User.getAttributes().get("nickname");
 
-//        String email= (String) profile.get("email");
-//        String name= (String) profile.get("nickname");
-        memberEntity=new MemberEntity(userId);
+        String name = (String) profile.get("nickname");
+        String email = (String) kakao_account.get("email");
+        memberEntity=new MemberEntity(email,userId,name);
 
         memberRepository.save(memberEntity);
         return new CustomOAuth2User(userId);

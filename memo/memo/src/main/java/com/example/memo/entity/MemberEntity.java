@@ -33,10 +33,10 @@ public class MemberEntity { //table 역할
         this.memberPassword = dto.getMemberPassword();
         this.memberName = dto.getMemberName();
     }
-    public MemberEntity(String userId){
-        this.memberEmail = userId;
-        this.memberPassword ="@kakao";
-        this.memberName = "name";
+    public MemberEntity(String email,String userId,String name){
+        this.memberEmail = email;
+        this.memberPassword =userId;
+        this.memberName = name;
     }
 
     public static MemberEntity toMemberEntity(MemberDTO memberDTO){
