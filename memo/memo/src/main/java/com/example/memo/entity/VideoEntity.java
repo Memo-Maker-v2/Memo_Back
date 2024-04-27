@@ -22,10 +22,6 @@ public class VideoEntity {
     @Column
     private String summary;
 
-    /*gpt 질문내용*/
-    @Column
-    private String question;
-
     /*필기내용*/
     @Column
     private String document;
