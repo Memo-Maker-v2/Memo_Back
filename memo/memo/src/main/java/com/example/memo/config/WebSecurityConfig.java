@@ -48,7 +48,7 @@ public class WebSecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeRequests(request -> request
-                        .requestMatchers("/", "/api/v1/auth/**","/oauth2/**","/videos", "/categories","/api/v1/questions/**").permitAll()  //접근허용 페이지 수정필요
+                        .requestMatchers("/", "/api/v1/auth/**","/oauth2/**","/videos/**", "/categories","/api/v1/questions/**").permitAll()  //접근허용 페이지 수정필요
                         .requestMatchers(HttpMethod.GET, "/api/v1/board/**", "/api/v1/user/*").permitAll() //접근제한 페이지 수정필요
                         .anyRequest().authenticated()
                 )

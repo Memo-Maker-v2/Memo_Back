@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/videos")
 public class VideoController {
@@ -17,7 +19,15 @@ public class VideoController {
     public VideoController(VideoService videoService) {
         this.videoService = videoService;
     }
-
+    @GetMapping("/most-frequent-url")
+    public ResponseEntity<List<String>> getMostFrequentVideoUrls() {
+        List<String> urls = videoService.findMostFrequentVideoUrl();
+        if (urls != null && !urls.isEmpty()) {
+            return ResponseEntity.ok(urls);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
     @PostMapping
     public ResponseEntity<Void> addVideo(@RequestBody VideoDto videoDto) {
         videoService.addVideo(videoDto);
