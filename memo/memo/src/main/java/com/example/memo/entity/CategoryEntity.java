@@ -26,7 +26,6 @@ public class CategoryEntity {
     private long categorySequence;
 
     public CategoryEntity(CategoryDto dto) {
-        this.categoryId = dto.getCategoryId();
         this.categoryName = dto.getCategoryName();
         this.categorySequence = dto.getCategorySequence();
     }
