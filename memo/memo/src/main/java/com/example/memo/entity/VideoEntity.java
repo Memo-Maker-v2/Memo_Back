@@ -26,15 +26,6 @@ public class VideoEntity {
     @Column
     private String document;
 
-    @Column
-    private String hashtag1;
-
-    @Column
-    private String hashtag2;
-
-    @Column
-    private String hashtag3;
-
     /*유튜브영상 url*/
     @Column
     private String videoUrl;

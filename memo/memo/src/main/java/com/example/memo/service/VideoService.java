@@ -26,9 +26,6 @@ public class VideoService {
         VideoEntity videoEntity = new VideoEntity();
         videoEntity.setSummary(videoDto.getSummary());
         videoEntity.setDocument(videoDto.getDocument());
-        videoEntity.setHashtag1(videoDto.getHashtag1());
-        videoEntity.setHashtag2(videoDto.getHashtag2());
-        videoEntity.setHashtag3(videoDto.getHashtag3());
         videoEntity.setVideoUrl(videoDto.getVideoUrl());
         videoEntity.setThumbnailUrl(videoDto.getThumbnailUrl());
         videoEntity.setVideoTitle(videoDto.getVideoTitle());
