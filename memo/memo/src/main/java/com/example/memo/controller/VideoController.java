@@ -19,6 +19,7 @@ public class VideoController {
     public VideoController(VideoService videoService) {
         this.videoService = videoService;
     }
+    //가장 많이 본 video 3개
     @GetMapping("/most-frequent-url")
     public ResponseEntity<List<String>> getMostFrequentVideoUrls() {
         List<String> urls = videoService.findMostFrequentVideoUrl();
@@ -28,6 +29,7 @@ public class VideoController {
             return ResponseEntity.notFound().build();
         }
     }
+    //video 정보 추가
     @PostMapping
     public ResponseEntity<Void> addVideo(@RequestBody VideoDto videoDto) {
         videoService.addVideo(videoDto);

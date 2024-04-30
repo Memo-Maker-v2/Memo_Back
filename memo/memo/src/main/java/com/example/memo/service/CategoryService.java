@@ -15,10 +15,21 @@ public class CategoryService {
     public CategoryService(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
+    //category 추가
     @Transactional
     public void addCategory(CategoryDto categoryDto) {
         CategoryEntity categoryEntity = convertDtoToEntity(categoryDto);
         categoryRepository.save(categoryEntity);
+    }
+    //category 삭제
+    @Transactional
+    public boolean deleteCategory(long categoryId) {
+        if (categoryRepository.existsById(categoryId)) {
+            categoryRepository.deleteById(categoryId);
+            return true;
+        } else {
+            return false;
+        }
     }
     private CategoryEntity convertDtoToEntity(CategoryDto categoryDto) {
         //DTO를 Entity로 변환
