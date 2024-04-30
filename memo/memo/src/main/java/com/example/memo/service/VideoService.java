@@ -25,7 +25,6 @@ public class VideoService {
         //DTO를 Entity로 변환
         VideoEntity videoEntity = new VideoEntity();
         videoEntity.setSummary(videoDto.getSummary());
-        //videoEntity.setQuestion(videoDto.getQuestion());
         videoEntity.setDocument(videoDto.getDocument());
         videoEntity.setHashtag1(videoDto.getHashtag1());
         videoEntity.setHashtag2(videoDto.getHashtag2());
