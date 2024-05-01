@@ -24,4 +24,7 @@ public class QuestionEntity {
 
     @Column(name = "answer")
     private String answer;
+
+    @Column(name = "member_email")
+    private String memberEmail;
 }

@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/questions")
 public class QuestionController {
 
-
     private final QuestionService questionService;
 
     public QuestionController(QuestionService questionService) {
@@ -18,7 +17,7 @@ public class QuestionController {
 
     @PostMapping("/fetch-from-flask")
     @CrossOrigin("*")
-    public QuestionEntity saveQuestion(@RequestBody QuestionDto questionDto) {
+    public QuestionEntity saveQuestion(@RequestBody QuestionDto questionDto) throws Exception {
         return questionService.saveQuestion(questionDto);
     }
 }

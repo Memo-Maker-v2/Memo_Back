@@ -17,4 +17,6 @@ public class QuestionDto {
 
     private String answer;
 
+    private String memberEmail;
+
 }
