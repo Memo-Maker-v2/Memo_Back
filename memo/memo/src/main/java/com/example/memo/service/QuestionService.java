@@ -36,6 +36,7 @@ public class QuestionService {
         questionEntity.setQuestion(questionDto.getQuestion());
         questionEntity.setAnswer(questionDto.getAnswer());
         questionEntity.setMemberEmail(questionDto.getMemberEmail());  // 외래 키 설정
+        questionEntity.setVideoUrl(questionDto.getVideoUrl());
 
         return questionRepository.save(questionEntity);
     }

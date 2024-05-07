@@ -19,4 +19,6 @@ public class QuestionDto {
 
     private String memberEmail;
 
+    private String videoUrl;
+
 }

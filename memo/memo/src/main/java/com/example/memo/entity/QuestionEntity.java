@@ -27,4 +27,7 @@ public class QuestionEntity {
 
     @Column(name = "member_email")
     private String memberEmail;
+
+    @Column(name = "video_url")
+    private String videoUrl;
 }
