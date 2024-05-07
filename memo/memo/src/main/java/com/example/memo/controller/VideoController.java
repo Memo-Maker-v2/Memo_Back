@@ -41,7 +41,7 @@ public class VideoController {
     @PatchMapping("/document-save")
     @CrossOrigin("*")
     public ResponseEntity<?> updateVideoDocument(
-            @RequestParam("email") String email,
+            @RequestParam("memberEmail") String email,
             @RequestParam("videoUrl") String videoUrl,
             @RequestParam("document") String document) {
         try {
