@@ -1,6 +1,7 @@
 package com.example.memo.controller;
 
 import com.example.memo.dto.VideoDto;
+import com.example.memo.entity.VideoEntity;
 import com.example.memo.service.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ public class VideoController {
     }
     //가장 많이 본 video 3개
     @GetMapping("/most-frequent-url")
+    @CrossOrigin("*")
     public ResponseEntity<List<String>> getMostFrequentVideoUrls() {
         List<String> urls = videoService.findMostFrequentVideoUrl();
         if (urls != null && !urls.isEmpty()) {
@@ -30,13 +32,16 @@ public class VideoController {
         }
     }
     //video 정보 추가
-    @PostMapping
-    public ResponseEntity<Void> addVideo(@RequestBody VideoDto videoDto) {
-        videoService.addVideo(videoDto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    @PostMapping("/save")
+    @CrossOrigin("*")
+    public VideoEntity saveVideo(@RequestBody VideoDto videoDto) throws Exception{
+//        videoService.addVideo(videoDto);
+////        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return videoService.saveVideo(videoDto);
     }
     //필기내용 검색
     @GetMapping("/search")
+    @CrossOrigin("*")
     public ResponseEntity<List<Long>> searchVideosByKeyword(@RequestParam("keyword") String keyword) {
         List<Long> videoIds = videoService.searchVideosByKeyword(keyword);
         if (!videoIds.isEmpty()) {
@@ -48,6 +53,7 @@ public class VideoController {
     }
     //video 삭제
     @DeleteMapping("delete-video/{videoId}")
+    @CrossOrigin("*")
     public ResponseEntity<Void> deleteCategory(@PathVariable("videoId") long videoId) {
         if (videoService.deleteVideo(videoId)) {
             return ResponseEntity.ok().build(); // 성공적으로 삭제되면 200 OK 응답

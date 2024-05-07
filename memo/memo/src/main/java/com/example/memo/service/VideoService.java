@@ -1,7 +1,9 @@
 package com.example.memo.service;
 
 import com.example.memo.dto.VideoDto;
+import com.example.memo.entity.MemberEntity;
 import com.example.memo.entity.VideoEntity;
+import com.example.memo.repository.MemberRepository;
 import com.example.memo.repository.VideoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -15,16 +17,39 @@ import java.util.stream.Collectors;
 public class VideoService {
 
     private final VideoRepository videoRepository;
+    private final MemberRepository memberRepository;
 
     @Autowired
-    public VideoService(VideoRepository videoRepository) {
+    public VideoService(VideoRepository videoRepository, MemberRepository memberRepository) {
         this.videoRepository = videoRepository;
+        this.memberRepository = memberRepository;
     }
     //video 추가
+//    @Transactional
+//    public void addVideo(VideoDto videoDto) {
+//        VideoEntity videoEntity = convertDtoToEntity(videoDto);
+//        videoRepository.save(videoEntity);
+//    }
     @Transactional
-    public void addVideo(VideoDto videoDto) {
-        VideoEntity videoEntity = convertDtoToEntity(videoDto);
-        videoRepository.save(videoEntity);
+    public VideoEntity saveVideo(VideoDto videoDto) throws Exception{
+        String memberEmail = videoDto.getMemberEmail();
+        if (memberEmail == null) {
+            throw new IllegalArgumentException("Member email is missing in the request.");
+        }
+
+        MemberEntity member = memberRepository.findByMemberEmail(memberEmail);  // 멤버 찾기
+        if (member == null) {
+            /*throw new UserNotFoundException("User not found: " + memberEmail);  // 멤버가 없을 때 예외 처리*/
+            throw new Exception();
+        }
+        VideoEntity videoEntity = new VideoEntity();
+        videoEntity.setSummary(videoDto.getSummary());
+        videoEntity.setDocument(videoDto.getDocument());
+        videoEntity.setVideoUrl(videoDto.getVideoUrl());
+        videoEntity.setThumbnailUrl(videoDto.getThumbnailUrl());
+        videoEntity.setVideoTitle(videoDto.getVideoTitle());
+        videoEntity.setMemberEmail(videoDto.getMemberEmail());
+        return videoRepository.save(videoEntity);
     }
     //가장 많이 검색된 video 3개
     @Transactional(readOnly = true)
@@ -48,14 +73,15 @@ public class VideoService {
             return false;
         }
     }
-    private VideoEntity convertDtoToEntity(VideoDto videoDto) {
-        //DTO를 Entity로 변환
-        VideoEntity videoEntity = new VideoEntity();
-        videoEntity.setSummary(videoDto.getSummary());
-        videoEntity.setDocument(videoDto.getDocument());
-        videoEntity.setVideoUrl(videoDto.getVideoUrl());
-        videoEntity.setThumbnailUrl(videoDto.getThumbnailUrl());
-        videoEntity.setVideoTitle(videoDto.getVideoTitle());
-        return videoEntity;
-    }
+//    private VideoEntity convertDtoToEntity(VideoDto videoDto) {
+//        //DTO를 Entity로 변환
+//        VideoEntity videoEntity = new VideoEntity();
+//        videoEntity.setSummary(videoDto.getSummary());
+//        videoEntity.setDocument(videoDto.getDocument());
+//        videoEntity.setVideoUrl(videoDto.getVideoUrl());
+//        videoEntity.setThumbnailUrl(videoDto.getThumbnailUrl());
+//        videoEntity.setVideoTitle(videoDto.getVideoTitle());
+//        videoEntity.setMemberEmail(videoDto.getMemberEmail());
+//        return videoEntity;
+//    }
 }
