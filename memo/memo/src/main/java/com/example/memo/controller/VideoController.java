@@ -1,5 +1,6 @@
 package com.example.memo.controller;
 
+import com.example.memo.dto.VideoDocumentUpdateDto;
 import com.example.memo.dto.VideoDto;
 import com.example.memo.entity.VideoEntity;
 import com.example.memo.service.VideoService;
@@ -38,14 +39,28 @@ public class VideoController {
         return videoService.saveVideo(videoDto);
     }
     //document내용 저장
+//    @PatchMapping("/document-save")
+//    @CrossOrigin("*")
+//    public ResponseEntity<?> updateVideoDocument(
+//            @RequestParam("memberEmail") String email,
+//            @RequestParam("videoUrl") String videoUrl,
+//            @RequestParam("document") String document) {
+//        try {
+//            VideoEntity updatedVideo = videoService.updateDocument(email, videoUrl, document);
+//            return ResponseEntity.ok(updatedVideo);
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().body(e.getMessage());
+//        }
+//    }
     @PatchMapping("/document-save")
     @CrossOrigin("*")
-    public ResponseEntity<?> updateVideoDocument(
-            @RequestParam("memberEmail") String email,
-            @RequestParam("videoUrl") String videoUrl,
-            @RequestParam("document") String document) {
+    public ResponseEntity<?> updateDocument(@RequestBody VideoDocumentUpdateDto videoDocumentDto) {
         try {
-            VideoEntity updatedVideo = videoService.updateDocument(email, videoUrl, document);
+            VideoEntity updatedVideo = videoService.updateDocument(
+                    videoDocumentDto.getMemberEmail(),
+                    videoDocumentDto.getVideoUrl(),
+                    videoDocumentDto.getDocument()
+            );
             return ResponseEntity.ok(updatedVideo);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -54,13 +69,16 @@ public class VideoController {
     //필기내용 검색
     @GetMapping("/search")
     @CrossOrigin("*")
-    public ResponseEntity<List<Long>> searchVideosByKeyword(@RequestParam("keyword") String keyword) {
-        List<Long> videoIds = videoService.searchVideosByKeyword(keyword);
-        if (!videoIds.isEmpty()) {
-            System.out.println(videoIds);
-            return ResponseEntity.ok(videoIds);
-        } else {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> updateVideoDocument(@RequestBody VideoDocumentUpdateDto videoDocumentDto) {
+        try {
+            VideoEntity updatedVideo = videoService.updateDocument(
+                    videoDocumentDto.getMemberEmail(),
+                    videoDocumentDto.getVideoUrl(),
+                    videoDocumentDto.getDocument()
+            );
+            return ResponseEntity.ok(updatedVideo);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
     //video 삭제

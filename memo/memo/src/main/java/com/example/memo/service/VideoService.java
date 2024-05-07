@@ -46,6 +46,7 @@ public class VideoService {
         videoEntity.setMemberEmail(videoDto.getMemberEmail());
         return videoRepository.save(videoEntity);
     }
+    //document 내용 추가
     @Transactional
     public VideoEntity updateDocument(String memberEmail, String videoUrl, String newDocument) throws Exception {
         VideoEntity video = videoRepository.findByMemberEmailAndVideoUrl(memberEmail, videoUrl);
