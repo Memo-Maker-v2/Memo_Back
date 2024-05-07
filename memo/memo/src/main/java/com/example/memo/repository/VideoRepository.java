@@ -17,4 +17,5 @@ public interface VideoRepository extends JpaRepository<VideoEntity, Long> {
     //필기내용 검색 query
     @Query("SELECT v.videoId FROM VideoEntity v WHERE LOWER(v.document) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Long> findVideoIdsByDocumentContaining(@Param("keyword") String keyword);
+    VideoEntity findByMemberEmailAndVideoUrl(String memberEmail, String videoUrl);
 }

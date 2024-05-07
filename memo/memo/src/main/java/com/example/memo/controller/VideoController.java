@@ -35,9 +35,21 @@ public class VideoController {
     @PostMapping("/save")
     @CrossOrigin("*")
     public VideoEntity saveVideo(@RequestBody VideoDto videoDto) throws Exception{
-//        videoService.addVideo(videoDto);
-////        return ResponseEntity.status(HttpStatus.CREATED).build();
         return videoService.saveVideo(videoDto);
+    }
+    //document내용 저장
+    @PatchMapping("/document-save")
+    @CrossOrigin("*")
+    public ResponseEntity<?> updateVideoDocument(
+            @RequestParam("email") String email,
+            @RequestParam("videoUrl") String videoUrl,
+            @RequestParam("document") String document) {
+        try {
+            VideoEntity updatedVideo = videoService.updateDocument(email, videoUrl, document);
+            return ResponseEntity.ok(updatedVideo);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
     //필기내용 검색
     @GetMapping("/search")

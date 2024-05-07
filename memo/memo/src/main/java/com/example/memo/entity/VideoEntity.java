@@ -38,8 +38,8 @@ public class VideoEntity {
     @Column
     private String videoTitle;
 
-    @Column(name = "category_id")
-    private String categoryId;
+    @Column(name = "category_name")
+    private String categoryName;
 
     @Column(name = "member_email")
     private String memberEmail;

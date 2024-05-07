@@ -24,14 +24,9 @@ public class VideoService {
         this.videoRepository = videoRepository;
         this.memberRepository = memberRepository;
     }
-    //video 추가
-//    @Transactional
-//    public void addVideo(VideoDto videoDto) {
-//        VideoEntity videoEntity = convertDtoToEntity(videoDto);
-//        videoRepository.save(videoEntity);
-//    }
+
     @Transactional
-    public VideoEntity saveVideo(VideoDto videoDto) throws Exception{
+    public VideoEntity saveVideo(VideoDto videoDto) throws Exception {
         String memberEmail = videoDto.getMemberEmail();
         if (memberEmail == null) {
             throw new IllegalArgumentException("Member email is missing in the request.");
@@ -51,6 +46,15 @@ public class VideoService {
         videoEntity.setMemberEmail(videoDto.getMemberEmail());
         return videoRepository.save(videoEntity);
     }
+    @Transactional
+    public VideoEntity updateDocument(String memberEmail, String videoUrl, String newDocument) throws Exception {
+        VideoEntity video = videoRepository.findByMemberEmailAndVideoUrl(memberEmail, videoUrl);
+        if (video == null) {
+            throw new Exception("Video not found with provided email and URL");
+        }
+        video.setDocument(newDocument);
+        return videoRepository.save(video);
+    }
     //가장 많이 검색된 video 3개
     @Transactional(readOnly = true)
     public List<String> findMostFrequentVideoUrl() {
@@ -58,11 +62,13 @@ public class VideoService {
         List<Object[]> results = videoRepository.findMostFrequentVideoUrl(pageRequest);
         return results.stream().map(result -> (String) result[0]).collect(Collectors.toList());
     }
+
     //필기내용 검색
     @Transactional(readOnly = true)
     public List<Long> searchVideosByKeyword(String keyword) {
         return videoRepository.findVideoIdsByDocumentContaining(keyword);
     }
+
     //video 삭제
     @Transactional
     public boolean deleteVideo(long videoId) {
@@ -73,15 +79,4 @@ public class VideoService {
             return false;
         }
     }
-//    private VideoEntity convertDtoToEntity(VideoDto videoDto) {
-//        //DTO를 Entity로 변환
-//        VideoEntity videoEntity = new VideoEntity();
-//        videoEntity.setSummary(videoDto.getSummary());
-//        videoEntity.setDocument(videoDto.getDocument());
-//        videoEntity.setVideoUrl(videoDto.getVideoUrl());
-//        videoEntity.setThumbnailUrl(videoDto.getThumbnailUrl());
-//        videoEntity.setVideoTitle(videoDto.getVideoTitle());
-//        videoEntity.setMemberEmail(videoDto.getMemberEmail());
-//        return videoEntity;
-//    }
 }
