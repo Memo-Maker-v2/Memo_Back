@@ -30,4 +30,16 @@ public class UserServiceImplement implements UserService {
 
         return GetSignInUserResponseDto.success(memberEntity);
     }
+
+    @Override
+    public ResponseEntity<?> updateMemberName(String email, String newName) {
+        MemberEntity memberEntity=memberRepository.findByMemberEmail(email);
+        if(memberEntity!=null){
+            memberEntity.setMemberName(newName);
+            memberRepository.save(memberEntity);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+
 }

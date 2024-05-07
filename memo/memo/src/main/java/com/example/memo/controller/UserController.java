@@ -6,9 +6,7 @@ import com.example.memo.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -21,5 +19,10 @@ public class UserController {
     public ResponseEntity<? super GetSignInUserResponseDto> getSignInUser(@AuthenticationPrincipal String memberEmail) {
        ResponseEntity<? super GetSignInUserResponseDto> response = userService.getSignInUser(memberEmail);
        return response;
+    }
+    //이름변경
+    @PatchMapping("/update-name")
+    public ResponseEntity<?> updateMemberName(@RequestParam("email") String email,@RequestParam("newName") String newName){
+        return userService.updateMemberName(email,newName);
     }
 }
