@@ -1,8 +1,10 @@
 package com.example.memo.service.implement;
 
 import com.example.memo.dto.*;
+import com.example.memo.entity.CategoryEntity;
 import com.example.memo.entity.MemberEntity;
 import com.example.memo.provider.JwtProvider;
+import com.example.memo.repository.CategoryRepository;
 import com.example.memo.repository.MemberRepository;
 import com.example.memo.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 public class AuthServiceImplement implements AuthService {
 
     private final MemberRepository memberRepository;
+    private final CategoryRepository categoryRepository;
     private final JwtProvider jwtProvider;
 
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -38,6 +41,13 @@ public class AuthServiceImplement implements AuthService {
 
             MemberEntity memberEntity = new MemberEntity(dto);
             memberRepository.save(memberEntity);
+
+            // 기본 카테고리 생성
+            CategoryEntity defaultCategory = new CategoryEntity();
+            defaultCategory.setCategoryName("최근 본 영상"); // 원하는 이름으로 설정
+            //defaultCategory.setCategorySequence(1); // 순서가 필요한 경우
+            defaultCategory.setMemberEmail(memberEmail); // 회원의 이메일로 소유자 설정
+            categoryRepository.save(defaultCategory); // 데이터베이스에 저장
 
         } catch (Exception exception) {
             exception.printStackTrace();

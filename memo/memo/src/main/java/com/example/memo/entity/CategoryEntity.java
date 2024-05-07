@@ -28,4 +28,7 @@ public class CategoryEntity {
     @Column
     private long categorySequence;
 
+    @Column(name = "member_email")
+    private String memberEmail;
+
 }

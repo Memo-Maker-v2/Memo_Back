@@ -18,4 +18,6 @@ public class CategoryDto {
     private String categoryName;
 
     private long categorySequence;
+
+    private String memberEmail;
 }
