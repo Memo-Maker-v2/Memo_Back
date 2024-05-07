@@ -27,6 +27,7 @@ public class VideoDto {
     @NotBlank
     private String videoTitle;
 
-    private String filtering;
+    @NotBlank
+    private String memberEmail;
 
 }

@@ -38,11 +38,9 @@ public class VideoEntity {
     @Column
     private String videoTitle;
 
-    /*영상주제 필터링 카테고리*/
-    @Column
-    private String filtering;
+    @Column(name = "category_id")
+    private String categoryId;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private CategoryEntity categoryEntity;
+    @Column(name = "member_email")
+    private String memberEmail;
 }
