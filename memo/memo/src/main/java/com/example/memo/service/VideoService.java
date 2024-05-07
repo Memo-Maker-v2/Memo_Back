@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,16 +20,33 @@ public class VideoService {
     public VideoService(VideoRepository videoRepository) {
         this.videoRepository = videoRepository;
     }
+    //video 추가
     @Transactional
     public void addVideo(VideoDto videoDto) {
         VideoEntity videoEntity = convertDtoToEntity(videoDto);
         videoRepository.save(videoEntity);
     }
+    //가장 많이 검색된 video 3개
     @Transactional(readOnly = true)
     public List<String> findMostFrequentVideoUrl() {
         PageRequest pageRequest = PageRequest.of(0, 3);  // 첫 페이지에서 상위 3개의 결과만 요청
         List<Object[]> results = videoRepository.findMostFrequentVideoUrl(pageRequest);
         return results.stream().map(result -> (String) result[0]).collect(Collectors.toList());
+    }
+    //필기내용 검색
+    @Transactional(readOnly = true)
+    public List<Long> searchVideosByKeyword(String keyword) {
+        return videoRepository.findVideoIdsByDocumentContaining(keyword);
+    }
+    //video 삭제
+    @Transactional
+    public boolean deleteVideo(long videoId) {
+        if (videoRepository.existsById(videoId)) {
+            videoRepository.deleteById(videoId);
+            return true;
+        } else {
+            return false;
+        }
     }
     private VideoEntity convertDtoToEntity(VideoDto videoDto) {
         //DTO를 Entity로 변환

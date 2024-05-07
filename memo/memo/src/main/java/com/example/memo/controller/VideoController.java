@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/videos")
+@RequestMapping("/api/v1/video")
 public class VideoController {
 
     private final VideoService videoService;
@@ -34,5 +34,25 @@ public class VideoController {
     public ResponseEntity<Void> addVideo(@RequestBody VideoDto videoDto) {
         videoService.addVideo(videoDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+    //필기내용 검색
+    @GetMapping("/search")
+    public ResponseEntity<List<Long>> searchVideosByKeyword(@RequestParam("keyword") String keyword) {
+        List<Long> videoIds = videoService.searchVideosByKeyword(keyword);
+        if (!videoIds.isEmpty()) {
+            System.out.println(videoIds);
+            return ResponseEntity.ok(videoIds);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    //video 삭제
+    @DeleteMapping("delete-video/{videoId}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable("videoId") long videoId) {
+        if (videoService.deleteVideo(videoId)) {
+            return ResponseEntity.ok().build(); // 성공적으로 삭제되면 200 OK 응답
+        } else {
+            return ResponseEntity.notFound().build(); // 해당 ID의 카테고리가 없는 경우 404 Not Found 응답
+        }
     }
 }

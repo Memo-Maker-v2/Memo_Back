@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/categories")
+@RequestMapping("api/v1/category")
 public class CategoryController {
     private final CategoryService categoryService;
 
@@ -21,7 +21,7 @@ public class CategoryController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
     //category 삭제
-    @DeleteMapping("/{categoryId}")
+    @DeleteMapping("delete/{categoryId}")
     public ResponseEntity<Void> deleteCategory(@PathVariable("categoryId") long categoryId) {
         if (categoryService.deleteCategory(categoryId)) {
             return ResponseEntity.ok().build(); // 성공적으로 삭제되면 200 OK 응답
