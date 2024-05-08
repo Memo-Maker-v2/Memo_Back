@@ -2,6 +2,7 @@ package com.example.memo.controller;
 
 
 import com.example.memo.dto.GetSignInUserResponseDto;
+import com.example.memo.dto.MemberNameUpdateDto;
 import com.example.memo.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,8 @@ public class UserController {
     }
     //이름변경
     @PatchMapping("/update-name")
-    public ResponseEntity<?> updateMemberName(@RequestParam("email") String email,@RequestParam("newName") String newName){
-        return userService.updateMemberName(email,newName);
+    @CrossOrigin("*")
+    public ResponseEntity<?> updateMemberName(@RequestBody MemberNameUpdateDto memberNameUpdateDto) {
+        return userService.updateMemberName(memberNameUpdateDto.getMemberEmail(), memberNameUpdateDto.getNewName());
     }
 }

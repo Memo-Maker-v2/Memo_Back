@@ -39,19 +39,6 @@ public class VideoController {
         return videoService.saveVideo(videoDto);
     }
     //document내용 저장
-//    @PatchMapping("/document-save")
-//    @CrossOrigin("*")
-//    public ResponseEntity<?> updateVideoDocument(
-//            @RequestParam("memberEmail") String email,
-//            @RequestParam("videoUrl") String videoUrl,
-//            @RequestParam("document") String document) {
-//        try {
-//            VideoEntity updatedVideo = videoService.updateDocument(email, videoUrl, document);
-//            return ResponseEntity.ok(updatedVideo);
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().body(e.getMessage());
-//        }
-//    }
     @PatchMapping("/document-save")
     @CrossOrigin("*")
     public ResponseEntity<?> updateDocument(@RequestBody VideoDocumentUpdateDto videoDocumentDto) {
@@ -61,10 +48,13 @@ public class VideoController {
                     videoDocumentDto.getVideoUrl(),
                     videoDocumentDto.getDocument()
             );
+            String document=videoDocumentDto.getDocument();
+            System.out.println(document+ "받음");
             return ResponseEntity.ok(updatedVideo);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+
     }
     //필기내용 검색
     @GetMapping("/search")
