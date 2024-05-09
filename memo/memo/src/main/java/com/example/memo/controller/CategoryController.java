@@ -14,7 +14,7 @@ public class CategoryController {
 
     @Autowired
     public CategoryController(CategoryService categoryService){this.categoryService=categoryService;}
-    //category 저장
+    //category 추가
     @PostMapping
     public ResponseEntity<Void> addCategory(@RequestBody CategoryDto categoryDto) {
         categoryService.addCategory(categoryDto);

@@ -24,10 +24,10 @@ public class VideoController {
     //가장 많이 본 video 3개
     @GetMapping("/most-frequent-url")
     @CrossOrigin("*")
-    public ResponseEntity<List<String>> getMostFrequentVideoUrls() {
-        List<String> urls = videoService.findMostFrequentVideoUrl();
-        if (urls != null && !urls.isEmpty()) {
-            return ResponseEntity.ok(urls);
+    public ResponseEntity<List<VideoDto>> getMostFrequentVideos() {
+        List<VideoDto> videos = videoService.findMostFrequentVideos();
+        if (videos != null && !videos.isEmpty()) {
+            return ResponseEntity.ok(videos);
         } else {
             return ResponseEntity.notFound().build();
         }

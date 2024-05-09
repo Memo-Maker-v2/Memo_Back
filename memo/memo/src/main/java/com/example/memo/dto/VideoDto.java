@@ -30,4 +30,9 @@ public class VideoDto {
     @NotBlank
     private String memberEmail;
 
+    public VideoDto(String videoTitle, String thumbnailUrl, String videoUrl) {
+        this.videoTitle=videoTitle;
+        this.thumbnailUrl=thumbnailUrl;
+        this.videoUrl=videoUrl;
+    }
 }

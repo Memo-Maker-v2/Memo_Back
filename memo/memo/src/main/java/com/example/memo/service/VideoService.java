@@ -46,6 +46,7 @@ public class VideoService {
         videoEntity.setMemberEmail(videoDto.getMemberEmail());
         return videoRepository.save(videoEntity);
     }
+
     //document 내용 추가
     @Transactional
     public VideoEntity updateDocument(String memberEmail, String videoUrl, String newDocument) throws Exception {
@@ -56,12 +57,15 @@ public class VideoService {
         video.setDocument(newDocument);
         return videoRepository.save(video);
     }
+
     //가장 많이 검색된 video 3개
     @Transactional(readOnly = true)
-    public List<String> findMostFrequentVideoUrl() {
-        PageRequest pageRequest = PageRequest.of(0, 3);  // 첫 페이지에서 상위 3개의 결과만 요청
-        List<Object[]> results = videoRepository.findMostFrequentVideoUrl(pageRequest);
-        return results.stream().map(result -> (String) result[0]).collect(Collectors.toList());
+    public List<VideoDto> findMostFrequentVideos() {
+        PageRequest pageRequest = PageRequest.of(0, 3); // 첫 번째 페이지에 3개의 결과
+        List<Object[]> results = videoRepository.findMostFrequentVideos(pageRequest);
+        return results.stream()
+                .map(result -> new VideoDto((String) result[0], (String) result[1], (String) result[2]))
+                .collect(Collectors.toList());
     }
 
     //필기내용 검색
