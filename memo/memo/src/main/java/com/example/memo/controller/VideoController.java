@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/video")
@@ -57,18 +58,25 @@ public class VideoController {
 
     }
     //필기내용 검색
-    @GetMapping("/search")
+//    @GetMapping("/search")
+//    @CrossOrigin("*")
+//    public ResponseEntity<List<VideoEntity>> searchVideosByKeyword(@RequestParam("keyword") String keyword) {
+//        List<VideoEntity> videos = videoService.searchVideosByKeyword(keyword);
+//        if (!videos.isEmpty()) {
+//            return ResponseEntity.ok(videos);
+//        } else {
+//            return ResponseEntity.notFound().build();
+//        }
+//    }
+    @PostMapping("/search")
     @CrossOrigin("*")
-    public ResponseEntity<?> updateVideoDocument(@RequestBody VideoDocumentUpdateDto videoDocumentDto) {
-        try {
-            VideoEntity updatedVideo = videoService.updateDocument(
-                    videoDocumentDto.getMemberEmail(),
-                    videoDocumentDto.getVideoUrl(),
-                    videoDocumentDto.getDocument()
-            );
-            return ResponseEntity.ok(updatedVideo);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+    public ResponseEntity<List<VideoEntity>> searchVideosByKeyword(@RequestBody Map<String, String> requestBody) {
+        String keyword = requestBody.get("keyword");
+        List<VideoEntity> videos = videoService.searchVideosByKeyword(keyword);
+        if (!videos.isEmpty()) {
+            return ResponseEntity.ok(videos);
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
     //video 삭제
