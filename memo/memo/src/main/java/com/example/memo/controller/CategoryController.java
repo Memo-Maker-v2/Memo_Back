@@ -15,8 +15,9 @@ public class CategoryController {
     @Autowired
     public CategoryController(CategoryService categoryService){this.categoryService=categoryService;}
     //category 추가
-    @PostMapping
-    public ResponseEntity<Void> addCategory(@RequestBody CategoryDto categoryDto) {
+    @PostMapping("/create")
+    @CrossOrigin("*")
+    public ResponseEntity<Void> addCategory(@RequestBody CategoryDto categoryDto) throws Exception {
         categoryService.addCategory(categoryDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

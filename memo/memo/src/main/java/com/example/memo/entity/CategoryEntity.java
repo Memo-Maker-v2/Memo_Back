@@ -25,9 +25,6 @@ public class CategoryEntity {
     @Column
     private String categoryName;
 
-    @Column
-    private long categorySequence;
-
     @Column(name = "member_email")
     private String memberEmail;
 

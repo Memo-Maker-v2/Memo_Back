@@ -19,8 +19,6 @@ public class CategoryDto {
     @NotBlank
     private String categoryName;
 
-    private long categorySequence;
-
     @NotBlank
     private String memberEmail;
 
