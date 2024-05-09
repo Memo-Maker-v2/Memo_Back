@@ -19,5 +19,10 @@ public class CategoryDto {
 
     private long categorySequence;
 
+    @NotBlank
     private String memberEmail;
+
+    public CategoryDto(String categoryName) {
+        this.categoryName = categoryName;
+    }
 }

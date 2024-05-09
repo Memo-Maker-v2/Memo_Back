@@ -6,9 +6,10 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
+
 @Getter
 public class SignInResponseDto extends ResponseDto {
-
     private String token;
     private int expirationTime;
 

@@ -8,5 +8,8 @@ import java.util.List;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<CategoryEntity,Long> {
-//    List<CategoryEntity> findByParentId(Long parentId);//부모 Id로 카테고리 검색
+    boolean existsByCategoryNameAndMemberEmail(String categoryName, String memberEmail);
+
+    // 회원 이메일로 모든 카테고리 찾기
+    List<CategoryEntity> findAllByMemberEmail(String memberEmail);
 }
