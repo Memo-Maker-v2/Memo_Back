@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,7 +24,11 @@ public class CategoryDto {
     @NotBlank
     private String memberEmail;
 
-    public CategoryDto(String categoryName) {
+    @NotBlank
+    private String memberName;  // 추가된 필드
+
+    public CategoryDto(String categoryName, String memberName) { // 생성자 수정
         this.categoryName = categoryName;
+        this.memberName = memberName;
     }
 }
