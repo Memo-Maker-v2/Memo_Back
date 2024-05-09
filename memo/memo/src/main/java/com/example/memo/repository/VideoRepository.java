@@ -16,10 +16,7 @@ public interface VideoRepository extends JpaRepository<VideoEntity, Long> {
     List<Object[]> findMostFrequentVideos(Pageable pageable);
 
     //필기내용 검색 query
-//    @Query("SELECT v.videoId FROM VideoEntity v WHERE LOWER(v.document) LIKE LOWER(CONCAT('%', :keyword, '%'))")
-//    List<Long> findVideoIdsByDocumentContaining(@Param("keyword") String keyword);
-    List<VideoEntity> findByDocumentContainingIgnoreCase(String keyword);
-
+    List<VideoEntity> findVideoByDocumentContainingAndMemberEmail(String keyword, String memberEmail);
 
     VideoEntity findByMemberEmailAndVideoUrl(String memberEmail, String videoUrl);
     VideoEntity findByVideoUrl(String videoUrl);

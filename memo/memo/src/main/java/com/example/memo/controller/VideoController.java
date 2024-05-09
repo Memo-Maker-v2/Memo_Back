@@ -58,21 +58,17 @@ public class VideoController {
 
     }
     //필기내용 검색
-//    @GetMapping("/search")
-//    @CrossOrigin("*")
-//    public ResponseEntity<List<VideoEntity>> searchVideosByKeyword(@RequestParam("keyword") String keyword) {
-//        List<VideoEntity> videos = videoService.searchVideosByKeyword(keyword);
-//        if (!videos.isEmpty()) {
-//            return ResponseEntity.ok(videos);
-//        } else {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
     @PostMapping("/search")
     @CrossOrigin("*")
-    public ResponseEntity<List<VideoEntity>> searchVideosByKeyword(@RequestBody Map<String, String> requestBody) {
+    public ResponseEntity<?> searchVideosByKeywordAndMemberEmail(@RequestBody Map<String, String> requestBody) {
         String keyword = requestBody.get("keyword");
-        List<VideoEntity> videos = videoService.searchVideosByKeyword(keyword);
+        String memberEmail = requestBody.get("memberEmail");
+
+        if (memberEmail == null || memberEmail.isEmpty()) {
+            return ResponseEntity.badRequest().body("Member email is required.");
+        }
+
+        List<VideoEntity> videos = videoService.searchVideosByKeywordAndMemberEmail(keyword, memberEmail);
         if (!videos.isEmpty()) {
             return ResponseEntity.ok(videos);
         } else {

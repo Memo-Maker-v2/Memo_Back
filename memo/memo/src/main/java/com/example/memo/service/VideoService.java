@@ -69,13 +69,9 @@ public class VideoService {
     }
 
     //필기내용 검색
-//    @Transactional(readOnly = true)
-//    public List<Long> searchVideosByKeyword(String keyword) {
-//        return videoRepository.findVideoIdsByDocumentContaining(keyword);
-//    }
     @Transactional(readOnly = true)
-    public List<VideoEntity> searchVideosByKeyword(String keyword) {
-        return videoRepository.findByDocumentContainingIgnoreCase(keyword);
+    public List<VideoEntity> searchVideosByKeywordAndMemberEmail(String keyword, String memberEmail) {
+        return videoRepository.findVideoByDocumentContainingAndMemberEmail(keyword, memberEmail);
     }
     //video 삭제
     @Transactional
