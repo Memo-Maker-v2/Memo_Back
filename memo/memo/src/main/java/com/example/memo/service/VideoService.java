@@ -1,9 +1,13 @@
 package com.example.memo.service;
 
+import com.example.memo.dto.QuestionDto;
+import com.example.memo.dto.VideoAndQuestionDto;
 import com.example.memo.dto.VideoDto;
 import com.example.memo.entity.MemberEntity;
+import com.example.memo.entity.QuestionEntity;
 import com.example.memo.entity.VideoEntity;
 import com.example.memo.repository.MemberRepository;
+import com.example.memo.repository.QuestionRepository;
 import com.example.memo.repository.VideoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -18,11 +22,12 @@ public class VideoService {
 
     private final VideoRepository videoRepository;
     private final MemberRepository memberRepository;
-
+    private final QuestionRepository questionRepository;
     @Autowired
-    public VideoService(VideoRepository videoRepository, MemberRepository memberRepository) {
+    public VideoService(VideoRepository videoRepository, MemberRepository memberRepository,QuestionRepository questionRepository) {
         this.videoRepository = videoRepository;
         this.memberRepository = memberRepository;
+        this.questionRepository=questionRepository;
     }
 
     @Transactional
@@ -83,5 +88,20 @@ public class VideoService {
         } else {
             return false;
         }
+    }
+    @Transactional(readOnly = true)
+    public VideoAndQuestionDto fetchVideoAndQuestions(String memberEmail, String videoUrl) {
+        VideoEntity video = videoRepository.findByMemberEmailAndVideoUrl(memberEmail, videoUrl);
+        if (video == null) {
+            throw new IllegalStateException("Video not found for the provided email and URL");
+        }
+
+        List<QuestionEntity> questions = questionRepository.findByVideoUrlAndMemberEmail(videoUrl, memberEmail);
+        List<QuestionDto> questionDtos = questions.stream()
+                .map(q -> new QuestionDto(q.getQuestion(), q.getAnswer(),q.getMemberEmail(),q.getVideoUrl()))
+                .collect(Collectors.toList());
+
+        VideoDto videoDto = new VideoDto(video.getVideoTitle(),video.getSummary(), video.getDocument(),video.getVideoUrl(),video.getMemberEmail());
+        return new VideoAndQuestionDto(videoDto, questionDtos);
     }
 }

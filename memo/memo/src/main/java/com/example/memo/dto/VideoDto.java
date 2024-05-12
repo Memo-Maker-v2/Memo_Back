@@ -40,4 +40,11 @@ public class VideoDto {
         this.thumbnailUrl=thumbnailUrl;
         this.videoUrl=videoUrl;
     }
+    public VideoDto(String videoTitle,String summary, String document,String videoUrl,String memberEmail) {
+        this.videoTitle=videoTitle;
+        this.summary=summary;
+        this.document=document;
+        this.videoUrl=videoUrl;
+        this.memberEmail=memberEmail;
+    }
 }

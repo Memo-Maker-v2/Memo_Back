@@ -1,5 +1,6 @@
 package com.example.memo.controller;
 
+import com.example.memo.dto.VideoAndQuestionDto;
 import com.example.memo.dto.VideoDocumentUpdateDto;
 import com.example.memo.dto.VideoDto;
 import com.example.memo.entity.VideoEntity;
@@ -86,14 +87,14 @@ public class VideoController {
         }
     }
     //category page에서 영상 클릭했을 때 영상 정보 불러옴
-//    @PostMapping("select-video")
-//    @CrossOrigin("*")
-//    public ResponseEntity<VideoDto> fetchVideoInfo(@RequestBody VideoRequestDto videoRequest) {
-//        try {
-//            VideoDto videoDto = videoService.fetchVideoInfo(videoRequest.getMemberEmail(), videoRequest.getVideoUrl());
-//            return ResponseEntity.ok(videoDto);
-//        } catch (Exception e) {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
+    @PostMapping("select-video")
+    @CrossOrigin("*")
+    public ResponseEntity<VideoAndQuestionDto> fetchVideoAndQuestions(@RequestBody VideoDto videoRequest) {
+        try {
+            VideoAndQuestionDto videoAndQuestions = videoService.fetchVideoAndQuestions(videoRequest.getMemberEmail(), videoRequest.getVideoUrl());
+            return ResponseEntity.ok(videoAndQuestions);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

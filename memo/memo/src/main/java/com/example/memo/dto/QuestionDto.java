@@ -20,5 +20,10 @@ public class QuestionDto {
     private String memberEmail;
 
     private String videoUrl;
-
+    public QuestionDto(String question, String answer,String memberEmail,String videoUrl) {
+        this.question = question;
+        this.answer = answer;
+        this.memberEmail=memberEmail;
+        this.videoUrl=videoUrl;
+    }
 }

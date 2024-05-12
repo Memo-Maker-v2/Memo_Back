@@ -1,7 +1,7 @@
 package com.example.memo.controller;
 
 
-import com.example.memo.dto.MemberDTO;
+import com.example.memo.dto.MemberDto;
 import com.example.memo.dto.SignInRequestDto;
 import com.example.memo.dto.SignInResponseDto;
 import com.example.memo.dto.SignUpResponseDto;
@@ -20,7 +20,7 @@ public class AuthController {
 
     @PostMapping("/sign-up")
     public ResponseEntity<? super SignUpResponseDto> signUp(
-            @RequestBody @Valid MemberDTO requestBody
+            @RequestBody @Valid MemberDto requestBody
     ) {
         ResponseEntity<? super SignUpResponseDto> response = authService.signUp(requestBody);
         return response;

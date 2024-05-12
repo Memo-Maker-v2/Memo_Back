@@ -26,7 +26,7 @@ public class AuthServiceImplement implements AuthService {
 
     @Override
     @Transactional
-    public ResponseEntity<? super SignUpResponseDto> signUp(MemberDTO dto) {
+    public ResponseEntity<? super SignUpResponseDto> signUp(MemberDto dto) {
 
         try {
             String memberEmail = dto.getMemberEmail();

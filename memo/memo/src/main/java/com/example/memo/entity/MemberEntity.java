@@ -1,6 +1,6 @@
 package com.example.memo.entity;
 
-import com.example.memo.dto.MemberDTO;
+import com.example.memo.dto.MemberDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,7 +27,7 @@ public class MemberEntity { //table 역할
     @Column
     private String memberName;
 
-    public MemberEntity(MemberDTO dto) {
+    public MemberEntity(MemberDto dto) {
         this.uid = dto.getUid();
         this.memberEmail = dto.getMemberEmail();
         this.memberPassword = dto.getMemberPassword();
@@ -39,7 +39,7 @@ public class MemberEntity { //table 역할
         this.memberName = name;
     }
 
-    public static MemberEntity toMemberEntity(MemberDTO memberDTO){
+    public static MemberEntity toMemberEntity(MemberDto memberDTO){
         MemberEntity memberEntity = new MemberEntity();
         memberEntity.setUid(memberDTO.getUid());
         memberEntity.setMemberEmail(memberDTO.getMemberEmail());
