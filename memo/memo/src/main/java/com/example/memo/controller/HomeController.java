@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Controller
+//@Controller
 @RequiredArgsConstructor
+@RestController
+@RequestMapping("api/v1/home")
 public class HomeController {
 
     private final CategoryRepository categoryRepository;

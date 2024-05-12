@@ -85,4 +85,15 @@ public class VideoController {
             return ResponseEntity.notFound().build(); // 해당 ID의 카테고리가 없는 경우 404 Not Found 응답
         }
     }
+    //category page에서 영상 클릭했을 때 영상 정보 불러옴
+//    @PostMapping("select-video")
+//    @CrossOrigin("*")
+//    public ResponseEntity<VideoDto> fetchVideoInfo(@RequestBody VideoRequestDto videoRequest) {
+//        try {
+//            VideoDto videoDto = videoService.fetchVideoInfo(videoRequest.getMemberEmail(), videoRequest.getVideoUrl());
+//            return ResponseEntity.ok(videoDto);
+//        } catch (Exception e) {
+//            return ResponseEntity.notFound().build();
+//        }
+//    }
 }

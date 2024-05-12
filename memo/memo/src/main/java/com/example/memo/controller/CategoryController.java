@@ -1,6 +1,7 @@
 package com.example.memo.controller;
 
 import com.example.memo.dto.CategoryDto;
+import com.example.memo.dto.VideoDto;
 import com.example.memo.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ public class CategoryController {
     }
     //category 삭제
     @DeleteMapping("delete/{categoryId}")
+    @CrossOrigin("*")
     public ResponseEntity<Void> deleteCategory(@PathVariable("categoryId") long categoryId) {
         if (categoryService.deleteCategory(categoryId)) {
             return ResponseEntity.ok().build(); // 성공적으로 삭제되면 200 OK 응답
