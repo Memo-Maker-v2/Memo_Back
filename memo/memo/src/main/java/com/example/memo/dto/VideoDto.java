@@ -28,6 +28,8 @@ public class VideoDto {
     private String videoTitle;
 
     @NotBlank
+    private String recentVideo;
+
     private String categoryName;
 
     @NotBlank

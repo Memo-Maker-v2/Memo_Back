@@ -41,18 +41,18 @@ public class AuthServiceImplement implements AuthService {
             String encodedPassword = passwordEncoder.encode(memberPassword); //password 암호화
             dto.setMemberPassword(encodedPassword); //암호화된 password 저장
 
-            // 회원가입 및 기본 카테고리 생성
-            MemberEntity memberEntity = new MemberEntity(dto);
-            memberRepository.save(memberEntity);
-
-            // 기본 카테고리 중복 확인
-            boolean categoryExists = categoryRepository.existsByCategoryNameAndMemberEmail("최근 본 영상", memberEntity.getMemberEmail());
-            if (!categoryExists) {
-                CategoryEntity defaultCategory = new CategoryEntity();
-                defaultCategory.setCategoryName("최근 본 영상");
-                defaultCategory.setMemberEmail(memberEntity.getMemberEmail());
-                categoryRepository.save(defaultCategory);
-            }
+//            // 회원가입 및 기본 카테고리 생성
+//            MemberEntity memberEntity = new MemberEntity(dto);
+//            memberRepository.save(memberEntity);
+//
+//            // 기본 카테고리 중복 확인
+//            boolean categoryExists = categoryRepository.existsByCategoryNameAndMemberEmail("최근 본 영상", memberEntity.getMemberEmail());
+//            if (!categoryExists) {
+//                CategoryEntity defaultCategory = new CategoryEntity();
+//                defaultCategory.setCategoryName("최근 본 영상");
+//                defaultCategory.setMemberEmail(memberEntity.getMemberEmail());
+//                categoryRepository.save(defaultCategory);
+//            }
 
         } catch (Exception exception) {
             exception.printStackTrace();
