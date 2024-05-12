@@ -28,6 +28,9 @@ public class VideoDto {
     private String videoTitle;
 
     @NotBlank
+    private String categoryName;
+
+    @NotBlank
     private String memberEmail;
 
     public VideoDto(String videoTitle, String thumbnailUrl, String videoUrl) {
