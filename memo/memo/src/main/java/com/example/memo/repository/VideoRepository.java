@@ -10,6 +10,7 @@ import java.util.List;
 
 @Repository
 public interface VideoRepository extends JpaRepository<VideoEntity, Long> {
+    boolean existsByVideoUrlAndMemberEmail(String videoUrl, String memberEmail);
     //가장 많이 저장된 video 3개 찾는 query
     @Query("SELECT v.videoTitle, v.thumbnailUrl, v.videoUrl, COUNT(v.videoUrl) AS count FROM VideoEntity v GROUP BY v.videoTitle, v.thumbnailUrl, v.videoUrl ORDER BY count DESC")
     List<Object[]> findMostFrequentVideos(Pageable pageable);
@@ -19,7 +20,8 @@ public interface VideoRepository extends JpaRepository<VideoEntity, Long> {
 
     VideoEntity findByMemberEmailAndVideoUrl(String memberEmail, String videoUrl);
     VideoEntity findByVideoUrl(String videoUrl);
-    //memberEmail로 video검색
-    List<VideoEntity> findByMemberEmail(String memberEmail);
+    //category별 video 검색
+    List<VideoEntity> findByCategoryNameAndMemberEmail(String categoryName, String memberEmail);
+
 
 }

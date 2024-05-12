@@ -33,10 +33,15 @@ public class VideoService {
     @Transactional
     public VideoEntity saveVideo(VideoDto videoDto) throws Exception {
         String memberEmail = videoDto.getMemberEmail();
+        String videoUrl = videoDto.getVideoUrl();
         if (memberEmail == null) {
             throw new IllegalArgumentException("Member email is missing in the request.");
         }
-
+        // 동일한 videoUrl과 memberEmail을 가진 비디오가 존재하는지 확인
+        if (videoRepository.existsByVideoUrlAndMemberEmail(videoUrl, memberEmail)) {
+            System.out.println("videoUrl 중복");
+            return null;
+        }
         MemberEntity member = memberRepository.findByMemberEmail(memberEmail);  // 멤버 찾기
         if (member == null) {
             /*throw new UserNotFoundException("User not found: " + memberEmail);  // 멤버가 없을 때 예외 처리*/
@@ -104,13 +109,12 @@ public class VideoService {
         VideoDto videoDto = new VideoDto(video.getVideoTitle(),video.getSummary(), video.getDocument(),video.getVideoUrl(),video.getMemberEmail());
         return new VideoAndQuestionDto(videoDto, questionDtos);
     }
-
-    //최근 본 영상 조회
+    //category별 영상 조회
     @Transactional(readOnly = true)
-    public List<VideoDto> findVideosByMemberEmail(String memberEmail) {
-        List<VideoEntity> videos = videoRepository.findByMemberEmail(memberEmail);
+    public List<VideoDto> findVideosByCategoryAndMemberEmail(String categoryName, String memberEmail) {
+        List<VideoEntity> videos = videoRepository.findByCategoryNameAndMemberEmail(categoryName, memberEmail);
         return videos.stream()
-                .map(video -> new VideoDto(video.getVideoUrl(), video.getThumbnailUrl(), video.getVideoTitle()))
+                .map(video -> new VideoDto(video.getVideoUrl(), video.getThumbnailUrl(), video.getVideoTitle(), video.getVideoUrl(), video.getMemberEmail(),video.getCategoryName()))
                 .collect(Collectors.toList());
     }
 

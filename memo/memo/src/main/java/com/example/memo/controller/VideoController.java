@@ -50,8 +50,6 @@ public class VideoController {
                     videoDocumentDto.getVideoUrl(),
                     videoDocumentDto.getDocument()
             );
-            String document=videoDocumentDto.getDocument();
-            System.out.println(document+ "받음");
             return ResponseEntity.ok(updatedVideo);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -98,15 +96,16 @@ public class VideoController {
         }
     }
     // 멤버 이메일에 따른 비디오 목록 조회
-    @PostMapping("/recent-video")
+    @PostMapping("/category-video")
     @CrossOrigin("*")
     public ResponseEntity<List<VideoDto>> getVideosByMemberEmail(@RequestBody Map<String, String> body) {
         String memberEmail = body.get("memberEmail");
+        String categoryName=body.get("categoryName");
         if (memberEmail == null || memberEmail.isEmpty()) {
             return ResponseEntity.badRequest().body(null);
         }
         try {
-            List<VideoDto> videos = videoService.findVideosByMemberEmail(memberEmail);
+            List<VideoDto> videos = videoService.findVideosByCategoryAndMemberEmail(categoryName,memberEmail);
             if (!videos.isEmpty()) {
                 return ResponseEntity.ok(videos);
             } else {
