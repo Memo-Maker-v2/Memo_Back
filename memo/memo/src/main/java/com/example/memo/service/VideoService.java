@@ -104,6 +104,7 @@ public class VideoService {
         VideoDto videoDto = new VideoDto(video.getVideoTitle(),video.getSummary(), video.getDocument(),video.getVideoUrl(),video.getMemberEmail());
         return new VideoAndQuestionDto(videoDto, questionDtos);
     }
+
     //최근 본 영상 조회
     @Transactional(readOnly = true)
     public List<VideoDto> findVideosByMemberEmail(String memberEmail) {
@@ -111,5 +112,19 @@ public class VideoService {
         return videos.stream()
                 .map(video -> new VideoDto(video.getVideoUrl(), video.getThumbnailUrl(), video.getVideoTitle()))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void addVideoToFolder(String memberEmail, String videoUrl, String categoryName) {
+        VideoEntity video = videoRepository.findByMemberEmailAndVideoUrl(memberEmail, videoUrl);
+
+        if (video == null) {
+            // 해당 비디오를 찾지 못한 경우에 대한 예외 처리
+            throw new IllegalArgumentException("Video not found for the provided memberEmail and videoUrl");
+        }
+
+        // 비디오를 찾은 경우에는 카테고리를 업데이트하고 저장합니다.
+        video.setCategoryName(categoryName);
+        videoRepository.save(video);
     }
 }
