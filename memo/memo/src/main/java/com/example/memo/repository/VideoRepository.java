@@ -4,7 +4,6 @@ import com.example.memo.entity.VideoEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,4 +19,7 @@ public interface VideoRepository extends JpaRepository<VideoEntity, Long> {
 
     VideoEntity findByMemberEmailAndVideoUrl(String memberEmail, String videoUrl);
     VideoEntity findByVideoUrl(String videoUrl);
+    //memberEmail로 video검색
+    List<VideoEntity> findByMemberEmail(String memberEmail);
+
 }

@@ -97,4 +97,23 @@ public class VideoController {
             return ResponseEntity.notFound().build();
         }
     }
+    // 멤버 이메일에 따른 비디오 목록 조회
+    @PostMapping("/recent-video")
+    @CrossOrigin("*")
+    public ResponseEntity<List<VideoDto>> getVideosByMemberEmail(@RequestBody Map<String, String> body) {
+        String memberEmail = body.get("memberEmail");
+        if (memberEmail == null || memberEmail.isEmpty()) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        try {
+            List<VideoDto> videos = videoService.findVideosByMemberEmail(memberEmail);
+            if (!videos.isEmpty()) {
+                return ResponseEntity.ok(videos);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }

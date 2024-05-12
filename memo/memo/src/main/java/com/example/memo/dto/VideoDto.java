@@ -27,18 +27,15 @@ public class VideoDto {
     @NotBlank
     private String videoTitle;
 
-    @NotBlank
-    private String recentVideo;
-
     private String categoryName;
 
     @NotBlank
     private String memberEmail;
 
-    public VideoDto(String videoTitle, String thumbnailUrl, String videoUrl) {
-        this.videoTitle=videoTitle;
-        this.thumbnailUrl=thumbnailUrl;
+    public VideoDto(String videoUrl, String thumbnailUrl,String videoTitle) {
         this.videoUrl=videoUrl;
+        this.thumbnailUrl=thumbnailUrl;
+        this.videoTitle=videoTitle;
     }
     public VideoDto(String videoTitle,String summary, String document,String videoUrl,String memberEmail) {
         this.videoTitle=videoTitle;

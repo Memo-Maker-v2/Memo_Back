@@ -48,7 +48,6 @@ public class VideoService {
         videoEntity.setVideoUrl(videoDto.getVideoUrl());
         videoEntity.setThumbnailUrl(videoDto.getThumbnailUrl());
         videoEntity.setVideoTitle(videoDto.getVideoTitle());
-        videoEntity.setRecentVideo(videoDto.getRecentVideo());
         videoEntity.setMemberEmail(videoDto.getMemberEmail());
         return videoRepository.save(videoEntity);
     }
@@ -89,6 +88,7 @@ public class VideoService {
             return false;
         }
     }
+    //video와 question 정보 가져옴
     @Transactional(readOnly = true)
     public VideoAndQuestionDto fetchVideoAndQuestions(String memberEmail, String videoUrl) {
         VideoEntity video = videoRepository.findByMemberEmailAndVideoUrl(memberEmail, videoUrl);
@@ -103,5 +103,13 @@ public class VideoService {
 
         VideoDto videoDto = new VideoDto(video.getVideoTitle(),video.getSummary(), video.getDocument(),video.getVideoUrl(),video.getMemberEmail());
         return new VideoAndQuestionDto(videoDto, questionDtos);
+    }
+    //최근 본 영상 조회
+    @Transactional(readOnly = true)
+    public List<VideoDto> findVideosByMemberEmail(String memberEmail) {
+        List<VideoEntity> videos = videoRepository.findByMemberEmail(memberEmail);
+        return videos.stream()
+                .map(video -> new VideoDto(video.getVideoUrl(), video.getThumbnailUrl(), video.getVideoTitle()))
+                .collect(Collectors.toList());
     }
 }

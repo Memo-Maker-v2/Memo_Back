@@ -38,10 +38,6 @@ public class VideoEntity {
     @Column
     private String videoTitle;
 
-    /*최근 본 영상 카테고리*/
-    @Column(name = "recent_video")
-    private String recentVideo;
-
     /*사용자가 직접 추가하는 카테고리*/
     @Column(name = "category_name")
     private String categoryName;
