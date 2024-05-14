@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -98,21 +99,21 @@ public class VideoController {
     // 멤버 이메일에 따른 비디오 목록 조회
     @PostMapping("/category-video")
     @CrossOrigin("*")
-    public ResponseEntity<List<VideoDto>> getVideosByMemberEmail(@RequestBody Map<String, String> body) {
+    public ResponseEntity<?> getVideosByCategory(@RequestBody Map<String, String> body) {
         String memberEmail = body.get("memberEmail");
         String categoryName=body.get("categoryName");
         if (memberEmail == null || memberEmail.isEmpty()) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.ok(false);
         }
         try {
             List<VideoDto> videos = videoService.findVideosByCategoryAndMemberEmail(categoryName,memberEmail);
             if (!videos.isEmpty()) {
                 return ResponseEntity.ok(videos);
             } else {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.ok(false);
             }
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.ok(false);
         }
     }
     //중복처리
