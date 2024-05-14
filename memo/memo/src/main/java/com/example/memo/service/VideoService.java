@@ -133,7 +133,12 @@ public class VideoService {
 
     @Transactional
     public void updateCategoryNameForMember(String memberEmail, String oldCategoryName, String newCategoryName) {
-        videoRepository.updateCategoryNameForMember(memberEmail, oldCategoryName, newCategoryName);
+        // video_table의 카테고리 이름 업데이트
+        List<VideoEntity> videos = videoRepository.findByMemberEmailAndCategoryName(memberEmail, oldCategoryName);
+        for (VideoEntity video : videos) {
+            video.setCategoryName(newCategoryName);
+            videoRepository.save(video);
+        }
     }
 
     //카테고리 삭제시 categoryName null로 해줌
