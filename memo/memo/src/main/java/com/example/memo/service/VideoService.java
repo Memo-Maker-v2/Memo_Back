@@ -29,6 +29,11 @@ public class VideoService {
         this.memberRepository = memberRepository;
         this.questionRepository=questionRepository;
     }
+    // 동일한 videoUrl과 memberEmail을 가진 비디오가 존재하는지 확인
+    @Transactional(readOnly = true)
+    public boolean videoExists(String memberEmail, String videoUrl) {
+        return videoRepository.existsByVideoUrlAndMemberEmail(videoUrl, memberEmail);
+    }
 
     @Transactional
     public VideoEntity saveVideo(VideoDto videoDto) throws Exception {
@@ -36,11 +41,6 @@ public class VideoService {
         String videoUrl = videoDto.getVideoUrl();
         if (memberEmail == null) {
             throw new IllegalArgumentException("Member email is missing in the request.");
-        }
-        // 동일한 videoUrl과 memberEmail을 가진 비디오가 존재하는지 확인
-        if (videoRepository.existsByVideoUrlAndMemberEmail(videoUrl, memberEmail)) {
-            System.out.println("videoUrl 중복");
-            return null;
         }
         MemberEntity member = memberRepository.findByMemberEmail(memberEmail);  // 멤버 찾기
         if (member == null) {
@@ -77,7 +77,6 @@ public class VideoService {
                 .map(result -> new VideoDto((String) result[0], (String) result[1], (String) result[2]))
                 .collect(Collectors.toList());
     }
-
     //필기내용 검색
     @Transactional(readOnly = true)
     public List<VideoEntity> searchVideosByKeywordAndMemberEmail(String keyword, String memberEmail) {
@@ -114,7 +113,7 @@ public class VideoService {
     public List<VideoDto> findVideosByCategoryAndMemberEmail(String categoryName, String memberEmail) {
         List<VideoEntity> videos = videoRepository.findByCategoryNameAndMemberEmail(categoryName, memberEmail);
         return videos.stream()
-                .map(video -> new VideoDto(video.getVideoUrl(), video.getThumbnailUrl(), video.getVideoTitle(), video.getVideoUrl(), video.getMemberEmail(),video.getCategoryName()))
+                .map(video -> new VideoDto(video.getVideoUrl(), video.getThumbnailUrl(), video.getVideoTitle(),video.getCategoryName()))
                 .collect(Collectors.toList());
     }
 

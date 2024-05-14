@@ -37,19 +37,17 @@ public class VideoDto {
         this.thumbnailUrl=thumbnailUrl;
         this.videoTitle=videoTitle;
     }
+    public VideoDto(String videoUrl, String thumbnailUrl,String videoTitle, String categoryName) {
+        this.videoUrl=videoUrl;
+        this.thumbnailUrl=thumbnailUrl;
+        this.videoTitle=videoTitle;
+        this.categoryName=categoryName;
+    }
     public VideoDto(String videoTitle,String summary, String document,String videoUrl,String memberEmail) {
         this.videoTitle=videoTitle;
         this.summary=summary;
         this.document=document;
         this.videoUrl=videoUrl;
         this.memberEmail=memberEmail;
-    }
-    public VideoDto(String videoTitle,String summary, String document,String videoUrl,String memberEmail,String categoryName) {
-        this.videoTitle=videoTitle;
-        this.summary=summary;
-        this.document=document;
-        this.videoUrl=videoUrl;
-        this.memberEmail=memberEmail;
-        this.categoryName=categoryName;
     }
 }

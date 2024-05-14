@@ -115,4 +115,10 @@ public class VideoController {
             return ResponseEntity.internalServerError().build();
         }
     }
+    //중복처리
+    @PostMapping("/check-duplicate")
+    public ResponseEntity<Boolean> checkVideoDuplicate(@RequestBody VideoDto videoDto) {
+        boolean exists = videoService.videoExists(videoDto.getMemberEmail(), videoDto.getVideoUrl());
+        return ResponseEntity.ok(!exists);
+    }
 }
