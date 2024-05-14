@@ -12,7 +12,7 @@ import java.util.List;
 public interface VideoRepository extends JpaRepository<VideoEntity, Long> {
     boolean existsByVideoUrlAndMemberEmail(String videoUrl, String memberEmail);
     //가장 많이 저장된 video 3개 찾는 query
-    @Query("SELECT v.videoTitle, v.thumbnailUrl, v.videoUrl, COUNT(v.videoUrl) AS count FROM VideoEntity v GROUP BY v.videoTitle, v.thumbnailUrl, v.videoUrl ORDER BY count DESC")
+    @Query("SELECT v.videoUrl, v.thumbnailUrl, v.videoTitle, COUNT(v.videoUrl) AS count FROM VideoEntity v GROUP BY v.videoTitle, v.thumbnailUrl, v.videoUrl ORDER BY count DESC")
     List<Object[]> findMostFrequentVideos(Pageable pageable);
 
     //필기내용 검색 query
