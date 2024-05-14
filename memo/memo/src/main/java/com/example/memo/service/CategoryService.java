@@ -26,6 +26,17 @@ public class CategoryService {
         CategoryEntity categoryEntity = convertDtoToEntity(categoryDto);
         categoryRepository.save(categoryEntity);
     }
+
+    // 카테고리 이름 수정 메서드
+    @Transactional
+    public void updateCategoryName(String memberEmail, String oldCategoryName, String newCategoryName) {
+        CategoryEntity categoryEntity = categoryRepository.findByMemberEmailAndCategoryName(memberEmail, oldCategoryName);
+        if (categoryEntity == null) {
+            throw new IllegalArgumentException("Category not found with name: " + oldCategoryName + " and member email: " + memberEmail);
+        }
+        categoryEntity.setCategoryName(newCategoryName);
+        categoryRepository.save(categoryEntity);
+    }
     //category 삭제
     @Transactional
     public boolean deleteCategory(long categoryId) {

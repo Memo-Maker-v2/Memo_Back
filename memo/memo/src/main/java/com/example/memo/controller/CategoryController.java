@@ -43,6 +43,20 @@ public class CategoryController {
         }
     }
 
+    // 카테고리 이름 수정 엔드포인트
+    @PutMapping("/update")
+    @CrossOrigin("*")
+    public ResponseEntity<Void> updateCategoryName(@RequestParam("memberEmail") String memberEmail,
+                                                   @RequestParam("oldCategoryName") String oldCategoryName,
+                                                   @RequestParam("newCategoryName") String newCategoryName) {
+        try {
+            categoryService.updateCategoryName(memberEmail, oldCategoryName, newCategoryName);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build(); // 해당 카테고리가 없는 경우 404 응답
+        }
+    }
+
     //category 삭제
     @DeleteMapping("delete/{categoryId}")
     @CrossOrigin("*")
