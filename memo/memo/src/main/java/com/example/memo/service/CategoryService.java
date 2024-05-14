@@ -12,11 +12,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CategoryService {
+    private final VideoService videoService;
     private final MemberRepository memberRepository;
     private final CategoryRepository categoryRepository;
     @Autowired
-    public CategoryService(MemberRepository memberRepository, CategoryRepository categoryRepository)
+    public CategoryService(VideoService videoService,MemberRepository memberRepository, CategoryRepository categoryRepository)
     {
+        this.videoService = videoService;
         this.memberRepository = memberRepository;
         this.categoryRepository = categoryRepository;
     }
@@ -39,13 +41,13 @@ public class CategoryService {
     }
     //category 삭제
     @Transactional
-    public boolean deleteCategory(long categoryId) {
-        if (categoryRepository.existsById(categoryId)) {
-            categoryRepository.deleteById(categoryId);
-            return true;
-        } else {
-            return false;
+    public boolean deleteCategory(String categoryName) {
+        if (!categoryRepository.existsByCategoryName(categoryName)) {
+            return false; // Return false if category does not exist
         }
+        videoService.removeCategoryFromVideos(categoryName); // First remove category from videos
+        categoryRepository.deleteByCategoryName(categoryName); // Then delete the category
+        return true;
     }
     private CategoryEntity convertDtoToEntity(CategoryDto categoryDto) throws Exception {
         String memberEmail = categoryDto.getMemberEmail();

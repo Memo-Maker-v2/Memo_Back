@@ -58,13 +58,13 @@ public class CategoryController {
     }
 
     //category 삭제
-    @DeleteMapping("delete/{categoryId}")
+    @DeleteMapping("delete/{categoryName}")
     @CrossOrigin("*")
-    public ResponseEntity<Void> deleteCategory(@PathVariable("categoryId") long categoryId) {
-        if (categoryService.deleteCategory(categoryId)) {
+    public ResponseEntity<?> deleteCategory(@PathVariable("categoryName") String categoryName) {
+        if (categoryService.deleteCategory(categoryName)) {
             return ResponseEntity.ok().build(); // 성공적으로 삭제되면 200 OK 응답
         } else {
-            return ResponseEntity.notFound().build(); // 해당 ID의 카테고리가 없는 경우 404 Not Found 응답
+            return ResponseEntity.ok(false);    //실패하면 false 반환
         }
     }
 }

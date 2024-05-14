@@ -130,4 +130,13 @@ public class VideoService {
         video.setCategoryName(categoryName);
         videoRepository.save(video);
     }
+    //카테고리 삭제시 categoryName null로 해줌
+    @Transactional
+    public void removeCategoryFromVideos(String categoryName) {
+        List<VideoEntity> videos = videoRepository.findByCategoryName(categoryName);
+        for (VideoEntity video : videos) {
+            video.setCategoryName(null); // Set categoryName to null
+            videoRepository.save(video); // Save the updated video
+        }
+    }
 }

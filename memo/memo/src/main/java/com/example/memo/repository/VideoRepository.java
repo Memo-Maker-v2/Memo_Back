@@ -22,6 +22,8 @@ public interface VideoRepository extends JpaRepository<VideoEntity, Long> {
     VideoEntity findByVideoUrl(String videoUrl);
     //category별 video 검색
     List<VideoEntity> findByCategoryNameAndMemberEmail(String categoryName, String memberEmail);
+    //category삭제
+    List<VideoEntity> findByCategoryName(String categoryName);
 
 
 }
