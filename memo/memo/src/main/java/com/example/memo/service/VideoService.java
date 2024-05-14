@@ -74,7 +74,7 @@ public class VideoService {
         PageRequest pageRequest = PageRequest.of(0, 3); // 첫 번째 페이지에 3개의 결과
         List<Object[]> results = videoRepository.findMostFrequentVideos(pageRequest);
         return results.stream()
-                .map(result -> new VideoDto((String) result[0], (String) result[1], (String) result[2]))
+                .map(result -> new VideoDto((String) result[2], (String) result[1], (String) result[0]))
                 .collect(Collectors.toList());
     }
     //필기내용 검색
