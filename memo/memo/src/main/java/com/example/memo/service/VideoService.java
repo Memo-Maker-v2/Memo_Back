@@ -130,6 +130,12 @@ public class VideoService {
         video.setCategoryName(categoryName);
         videoRepository.save(video);
     }
+
+    @Transactional
+    public void updateCategoryNameForMember(String memberEmail, String oldCategoryName, String newCategoryName) {
+        videoRepository.updateCategoryNameForMember(memberEmail, oldCategoryName, newCategoryName);
+    }
+
     //카테고리 삭제시 categoryName null로 해줌
     @Transactional
     public void removeCategoryFromVideos(String categoryName) {

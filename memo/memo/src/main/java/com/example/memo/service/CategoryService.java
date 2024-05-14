@@ -32,12 +32,16 @@ public class CategoryService {
     // 카테고리 이름 수정 메서드
     @Transactional
     public void updateCategoryName(String memberEmail, String oldCategoryName, String newCategoryName) {
+        // category_table의 카테고리 이름 업데이트
         CategoryEntity categoryEntity = categoryRepository.findByMemberEmailAndCategoryName(memberEmail, oldCategoryName);
         if (categoryEntity == null) {
             throw new IllegalArgumentException("Category not found with name: " + oldCategoryName + " and member email: " + memberEmail);
         }
         categoryEntity.setCategoryName(newCategoryName);
         categoryRepository.save(categoryEntity);
+
+        // video_table의 카테고리 이름 업데이트
+        videoService.updateCategoryNameForMember(memberEmail, oldCategoryName, newCategoryName);
     }
     //category 삭제
     @Transactional

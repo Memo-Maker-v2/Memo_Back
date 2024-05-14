@@ -3,8 +3,11 @@ package com.example.memo.repository;
 import com.example.memo.entity.VideoEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,4 +29,8 @@ public interface VideoRepository extends JpaRepository<VideoEntity, Long> {
     List<VideoEntity> findByCategoryName(String categoryName);
 
 
+    @Modifying
+    @Transactional
+    @Query("UPDATE VideoEntity v SET v.categoryName = :newCategoryName WHERE v.memberEmail = :memberEmail AND v.categoryName = :oldCategoryName")
+    int updateCategoryNameForMember(@Param("memberEmail") String memberEmail, @Param("oldCategoryName") String oldCategoryName, @Param("newCategoryName") String newCategoryName);
 }

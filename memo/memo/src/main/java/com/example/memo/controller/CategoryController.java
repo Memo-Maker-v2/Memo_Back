@@ -1,6 +1,7 @@
 package com.example.memo.controller;
 
 import com.example.memo.dto.CategoryDto;
+import com.example.memo.dto.CategoryUpdateDto;
 import com.example.memo.dto.VideoDto;
 import com.example.memo.dto.VideoFolderRequestDto;
 import com.example.memo.entity.VideoEntity;
@@ -46,11 +47,9 @@ public class CategoryController {
     // 카테고리 이름 수정 엔드포인트
     @PutMapping("/update")
     @CrossOrigin("*")
-    public ResponseEntity<Void> updateCategoryName(@RequestParam("memberEmail") String memberEmail,
-                                                   @RequestParam("oldCategoryName") String oldCategoryName,
-                                                   @RequestParam("newCategoryName") String newCategoryName) {
+    public ResponseEntity<Void> updateCategoryName(@RequestBody CategoryUpdateDto updateDto) {
         try {
-            categoryService.updateCategoryName(memberEmail, oldCategoryName, newCategoryName);
+            categoryService.updateCategoryName(updateDto.getMemberEmail(), updateDto.getOldCategoryName(), updateDto.getNewCategoryName());
             return ResponseEntity.ok().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build(); // 해당 카테고리가 없는 경우 404 응답
