@@ -120,6 +120,6 @@ public class VideoController {
     @PostMapping("/check-duplicate")
     public ResponseEntity<Boolean> checkVideoDuplicate(@RequestBody VideoDto videoDto) {
         boolean exists = videoService.videoExists(videoDto.getMemberEmail(), videoDto.getVideoUrl());
-        return ResponseEntity.ok(!exists);
+        return ResponseEntity.ok(exists);
     }
 }

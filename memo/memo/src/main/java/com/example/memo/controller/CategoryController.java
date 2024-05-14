@@ -2,10 +2,8 @@ package com.example.memo.controller;
 
 import com.example.memo.dto.CategoryDto;
 import com.example.memo.dto.CategoryUpdateDto;
-import com.example.memo.dto.VideoDto;
+import com.example.memo.dto.CategoryRequest;
 import com.example.memo.dto.VideoFolderRequestDto;
-import com.example.memo.entity.VideoEntity;
-import com.example.memo.repository.VideoRepository;
 import com.example.memo.service.CategoryService;
 import com.example.memo.service.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,13 +55,13 @@ public class CategoryController {
     }
 
     //category 삭제
-    @DeleteMapping("delete/{categoryName}")
+    @DeleteMapping("/delete-category")
     @CrossOrigin("*")
-    public ResponseEntity<?> deleteCategory(@PathVariable("categoryName") String categoryName) {
-        if (categoryService.deleteCategory(categoryName)) {
+    public ResponseEntity<?> deleteCategory(@RequestBody CategoryRequest categoryRequest) {
+        if (categoryService.deleteCategory(categoryRequest.getMemberEmail(), categoryRequest.getCategoryName())) {
             return ResponseEntity.ok().build(); // 성공적으로 삭제되면 200 OK 응답
         } else {
-            return ResponseEntity.ok(false);    //실패하면 false 반환
+            return ResponseEntity.ok(false);    // 실패하면 false 반환
         }
     }
 }

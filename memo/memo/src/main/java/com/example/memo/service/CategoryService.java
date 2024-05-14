@@ -45,12 +45,12 @@ public class CategoryService {
     }
     //category 삭제
     @Transactional
-    public boolean deleteCategory(String categoryName) {
-        if (!categoryRepository.existsByCategoryName(categoryName)) {
+    public boolean deleteCategory(String memberEmail, String categoryName) {
+        if (!categoryRepository.existsByMemberEmailAndCategoryName(memberEmail, categoryName)) {
             return false; // Return false if category does not exist
         }
-        videoService.removeCategoryFromVideos(categoryName); // First remove category from videos
-        categoryRepository.deleteByCategoryName(categoryName); // Then delete the category
+        videoService.removeCategoryFromVideos(memberEmail, categoryName); // First remove category from videos
+        categoryRepository.deleteByMemberEmailAndCategoryName(memberEmail, categoryName); // Then delete the category
         return true;
     }
     private CategoryEntity convertDtoToEntity(CategoryDto categoryDto) throws Exception {

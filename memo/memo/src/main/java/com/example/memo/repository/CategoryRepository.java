@@ -14,6 +14,6 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity,Long> {
     CategoryEntity findByMemberEmailAndCategoryName(String memberEmail, String oldCategoryName);
 
     //카테고리 삭제
-    boolean existsByCategoryName(String categoryName);
-    void deleteByCategoryName(String categoryName);
+    boolean existsByMemberEmailAndCategoryName(String memberEmail, String categoryName);
+    void deleteByMemberEmailAndCategoryName(String memberEmail, String categoryName);
 }
