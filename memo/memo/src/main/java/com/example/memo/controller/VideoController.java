@@ -49,7 +49,8 @@ public class VideoController {
             VideoEntity updatedVideo = videoService.updateDocument(
                     videoDocumentDto.getMemberEmail(),
                     videoDocumentDto.getVideoUrl(),
-                    videoDocumentDto.getDocument()
+                    videoDocumentDto.getDocument(),
+                    videoDocumentDto.getDocumentDate()
             );
             return ResponseEntity.ok(updatedVideo);
         } catch (Exception e) {

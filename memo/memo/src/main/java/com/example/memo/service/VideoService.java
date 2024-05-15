@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,12 +61,13 @@ public class VideoService {
 
     //document 내용 추가
     @Transactional
-    public VideoEntity updateDocument(String memberEmail, String videoUrl, String newDocument) throws Exception {
+    public VideoEntity updateDocument(String memberEmail, String videoUrl, String newDocument, LocalDate documentDate) throws Exception {
         VideoEntity video = videoRepository.findByMemberEmailAndVideoUrl(memberEmail, videoUrl);
         if (video == null) {
             throw new Exception("Video not found with provided email and URL");
         }
         video.setDocument(newDocument);
+        video.setDocumentDate(documentDate);
         return videoRepository.save(video);
     }
 
