@@ -36,6 +36,7 @@ public class VideoService {
         return videoRepository.existsByVideoUrlAndMemberEmail(videoUrl, memberEmail);
     }
 
+    //영상요약시 영상정보 저장
     @Transactional
     public VideoEntity saveVideo(VideoDto videoDto) throws Exception {
         String memberEmail = videoDto.getMemberEmail();
@@ -108,7 +109,7 @@ public class VideoService {
                 .map(q -> new QuestionDto(q.getQuestion(), q.getAnswer(),q.getMemberEmail(),q.getVideoUrl()))
                 .collect(Collectors.toList());
 
-        VideoDto videoDto = new VideoDto(video.getVideoTitle(),video.getSummary(), video.getDocument(),video.getVideoUrl(),video.getMemberEmail());
+        VideoDto videoDto = new VideoDto(video.getVideoTitle(),video.getSummary(), video.getDocument(),video.getVideoUrl(),video.getMemberEmail(), video.getDocumentDate());
         return new VideoAndQuestionDto(videoDto, questionDtos);
     }
     //categoryName과 memberEmail로 영상 조회
@@ -126,6 +127,8 @@ public class VideoService {
                 .map(video -> new VideoDto(video.getVideoUrl(), video.getThumbnailUrl(), video.getVideoTitle(), video.getCategoryName()))
                 .collect(Collectors.toList());
     }
+    
+    //카테고리에 영상 추가
     @Transactional
     public void addVideoToFolder(String memberEmail, String videoUrl, String categoryName) {
         VideoEntity video = videoRepository.findByMemberEmailAndVideoUrl(memberEmail, videoUrl);
@@ -140,9 +143,9 @@ public class VideoService {
         videoRepository.save(video);
     }
 
+    // video_table의 카테고리 이름 업데이트
     @Transactional
     public void updateCategoryNameForMember(String memberEmail, String oldCategoryName, String newCategoryName) {
-        // video_table의 카테고리 이름 업데이트
         List<VideoEntity> videos = videoRepository.findByMemberEmailAndCategoryName(memberEmail, oldCategoryName);
         for (VideoEntity video : videos) {
             video.setCategoryName(newCategoryName);

@@ -36,22 +36,23 @@ public class VideoDto {
 
     private LocalDate documentDate;
 
-    public VideoDto(String videoUrl, String thumbnailUrl,String videoTitle) {
+    public VideoDto(String videoUrl, String thumbnailUrl, String videoTitle) {
         this.videoUrl=videoUrl;
         this.thumbnailUrl=thumbnailUrl;
         this.videoTitle=videoTitle;
     }
-    public VideoDto(String videoUrl, String thumbnailUrl,String videoTitle, String categoryName) {
+    public VideoDto(String videoUrl, String thumbnailUrl, String videoTitle, String categoryName) {
         this.videoUrl=videoUrl;
         this.thumbnailUrl=thumbnailUrl;
         this.videoTitle=videoTitle;
         this.categoryName=categoryName;
     }
-    public VideoDto(String videoTitle,String summary, String document,String videoUrl,String memberEmail) {
+    public VideoDto(String videoTitle, String summary, String document, String videoUrl, String memberEmail, LocalDate documentDate) {
         this.videoTitle=videoTitle;
         this.summary=summary;
         this.document=document;
         this.videoUrl=videoUrl;
         this.memberEmail=memberEmail;
+        this.documentDate=documentDate;
     }
 }
