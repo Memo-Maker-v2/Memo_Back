@@ -54,6 +54,7 @@ public class VideoService {
         videoEntity.setThumbnailUrl(videoDto.getThumbnailUrl());
         videoEntity.setVideoTitle(videoDto.getVideoTitle());
         videoEntity.setMemberEmail(videoDto.getMemberEmail());
+        videoEntity.setDocumentDate(videoDto.getDocumentDate());
         return videoRepository.save(videoEntity);
     }
 

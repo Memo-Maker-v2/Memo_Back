@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -31,6 +33,8 @@ public class VideoDto {
 
     @NotBlank
     private String memberEmail;
+
+    private LocalDate documentDate;
 
     public VideoDto(String videoUrl, String thumbnailUrl,String videoTitle) {
         this.videoUrl=videoUrl;

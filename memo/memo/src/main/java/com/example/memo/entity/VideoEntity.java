@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Entity
 @Getter
 @Setter
@@ -44,4 +46,7 @@ public class VideoEntity {
 
     @Column(name = "member_email")
     private String memberEmail;
+
+    @Column(name = "document_date")
+    private LocalDate documentDate;
 }
