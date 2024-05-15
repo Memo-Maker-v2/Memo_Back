@@ -1,8 +1,6 @@
 package com.example.memo.controller;
 
-import com.example.memo.dto.VideoAndQuestionDto;
-import com.example.memo.dto.VideoDocumentUpdateDto;
-import com.example.memo.dto.VideoDto;
+import com.example.memo.dto.*;
 import com.example.memo.entity.VideoEntity;
 import com.example.memo.service.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,8 +122,19 @@ public class VideoController {
             return ResponseEntity.ok(false);
         }
     }
+    //video삭제
+    @DeleteMapping("/delete-video")
+    @CrossOrigin("*")
+    public ResponseEntity<?> deleteVideo(@RequestBody VideoDto videoDto) {
+        if (videoService.deleteVideo(videoDto.getMemberEmail(), videoDto.getVideoUrl())) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.ok(false);
+        }
+    }
     //중복처리
     @PostMapping("/check-duplicate")
+    @CrossOrigin("*")
     public ResponseEntity<Boolean> checkVideoDuplicate(@RequestBody VideoDto videoDto) {
         boolean exists = videoService.videoExists(videoDto.getMemberEmail(), videoDto.getVideoUrl());
         return ResponseEntity.ok(exists);

@@ -162,4 +162,15 @@ public class VideoService {
             videoRepository.save(video);
         }
     }
+    //video 삭제
+    @Transactional
+    public boolean deleteVideo(String memberEmail, String videoUrl) {
+        VideoEntity video = videoRepository.findByMemberEmailAndVideoUrl(memberEmail, videoUrl);
+        if (video != null) {
+            videoRepository.delete(video);
+            return true;
+        } else {
+            return false; // 비디오를 찾지 못한 경우
+        }
+    }
 }
