@@ -101,12 +101,19 @@ public class VideoController {
     @CrossOrigin("*")
     public ResponseEntity<?> getVideosByCategory(@RequestBody Map<String, String> body) {
         String memberEmail = body.get("memberEmail");
-        String categoryName=body.get("categoryName");
+        String categoryName = body.get("categoryName");
         if (memberEmail == null || memberEmail.isEmpty()) {
             return ResponseEntity.ok(false);
         }
         try {
-            List<VideoDto> videos = videoService.findVideosByCategoryAndMemberEmail(categoryName,memberEmail);
+            List<VideoDto> videos;
+            if (categoryName == null || categoryName.isEmpty()) {
+                // categoryName이 null이거나 비어 있을 때, memberEmail로 모든 비디오를 조회
+                videos = videoService.findVideosByMemberEmail(memberEmail);
+            } else {
+                // categoryName과 memberEmail로 비디오를 조회
+                videos = videoService.findVideosByCategoryAndMemberEmail(categoryName, memberEmail);
+            }
             if (!videos.isEmpty()) {
                 return ResponseEntity.ok(videos);
             } else {

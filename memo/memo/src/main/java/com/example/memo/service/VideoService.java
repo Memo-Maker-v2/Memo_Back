@@ -109,7 +109,7 @@ public class VideoService {
         VideoDto videoDto = new VideoDto(video.getVideoTitle(),video.getSummary(), video.getDocument(),video.getVideoUrl(),video.getMemberEmail());
         return new VideoAndQuestionDto(videoDto, questionDtos);
     }
-    //category별 영상 조회
+    //categoryName과 memberEmail로 영상 조회
     @Transactional(readOnly = true)
     public List<VideoDto> findVideosByCategoryAndMemberEmail(String categoryName, String memberEmail) {
         List<VideoEntity> videos = videoRepository.findByCategoryNameAndMemberEmail(categoryName, memberEmail);
@@ -117,7 +117,13 @@ public class VideoService {
                 .map(video -> new VideoDto(video.getVideoUrl(), video.getThumbnailUrl(), video.getVideoTitle(),video.getCategoryName()))
                 .collect(Collectors.toList());
     }
-
+    //memberEmail로 모든 영상을 조회
+    public List<VideoDto> findVideosByMemberEmail(String memberEmail) {
+        List<VideoEntity> videos = videoRepository.findByMemberEmail(memberEmail);
+        return videos.stream()
+                .map(video -> new VideoDto(video.getVideoUrl(), video.getThumbnailUrl(), video.getVideoTitle(), video.getCategoryName()))
+                .collect(Collectors.toList());
+    }
     @Transactional
     public void addVideoToFolder(String memberEmail, String videoUrl, String categoryName) {
         VideoEntity video = videoRepository.findByMemberEmailAndVideoUrl(memberEmail, videoUrl);
