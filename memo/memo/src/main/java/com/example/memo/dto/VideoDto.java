@@ -55,4 +55,13 @@ public class VideoDto {
         this.memberEmail=memberEmail;
         this.documentDate=documentDate;
     }
+    public VideoDto(String videoTitle, String summary, String document, String videoUrl, String memberEmail, LocalDate documentDate, String categoryName) {
+        this.videoTitle=videoTitle;
+        this.summary=summary;
+        this.document=document;
+        this.videoUrl=videoUrl;
+        this.memberEmail=memberEmail;
+        this.documentDate=documentDate;
+        this.categoryName=categoryName;
+    }
 }

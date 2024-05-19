@@ -109,7 +109,7 @@ public class VideoService {
                 .map(q -> new QuestionDto(q.getQuestion(), q.getAnswer(),q.getMemberEmail(),q.getVideoUrl()))
                 .collect(Collectors.toList());
 
-        VideoDto videoDto = new VideoDto(video.getVideoTitle(),video.getSummary(), video.getDocument(),video.getVideoUrl(),video.getMemberEmail(), video.getDocumentDate());
+        VideoDto videoDto = new VideoDto(video.getVideoTitle(),video.getSummary(), video.getDocument(),video.getVideoUrl(),video.getMemberEmail(), video.getDocumentDate(), video.getCategoryName());
         return new VideoAndQuestionDto(videoDto, questionDtos);
     }
     //categoryName과 memberEmail로 영상 조회
