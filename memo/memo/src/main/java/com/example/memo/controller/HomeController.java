@@ -35,8 +35,21 @@ public class HomeController {
         List<CategoryDto> categoryDtos = categoryRepository
                 .findAllByMemberEmail(memberEmail) // 데이터베이스에서 해당 이메일의 모든 카테고리 가져오기
                 .stream()
-                .map(category -> new CategoryDto(category.getCategoryName(), memberName)) // 멤버 이름 포함
+                .map(category -> {
+                    String categoryName = category.getCategoryName();
+                    // categoryName이 null이면 memberName만 포함된 CategoryDto 생성
+                    if (categoryName == null) {
+                        return new CategoryDto(memberName);
+                    } else {
+                        return new CategoryDto(categoryName, memberName);
+                    }
+                })
                 .collect(Collectors.toList());
+
+        // categoryName이 null인 경우에도 memberName이 포함된 DTO를 반환
+        if (categoryDtos.isEmpty()) {
+            categoryDtos.add(new CategoryDto(memberName));
+        }
 
         return ResponseEntity.ok(categoryDtos); // 성공 응답
     }
