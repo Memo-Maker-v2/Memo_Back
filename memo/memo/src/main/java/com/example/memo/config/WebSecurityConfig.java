@@ -2,6 +2,7 @@ package com.example.memo.config;
 
 import com.example.memo.filter.JwtAuthenticationFilter;
 import com.example.memo.handler.OAuth2SuccessHandler;
+import com.example.memo.service.implement.OAuth2UserServiceImplement;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,7 +34,7 @@ import java.io.IOException;
 public class WebSecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final DefaultOAuth2UserService oAuth2UserService;
+    private final OAuth2UserServiceImplement oAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Bean
@@ -49,11 +50,11 @@ public class WebSecurityConfig {
                 )
                 .authorizeRequests(request -> request
                         .requestMatchers("/", "/api/v1/auth/**","/oauth2/**","/api/v1/questions/**","api/v1/category/**","/api/v1/video/**","/api/v1/user/**", "/api/v1/home/**").permitAll()  //접근허용 페이지 수정필요
-                        .requestMatchers(HttpMethod.GET, "/api/v1/board/**", "/api/v1/user/*").permitAll() //접근제한 페이지 수정필요
+                        .requestMatchers(HttpMethod.GET, "/api/v1/board/**", "/api/v1/user/*","/api/v1/auth/**").permitAll() //접근제한 페이지 수정필요
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2->oauth2
-                        .authorizationEndpoint(endpoint->endpoint.baseUri("/api/v1/auth/oauth2"))
+                        .authorizationEndpoint(endpoint->endpoint.baseUri("/oauth2/authorization"))
                         .redirectionEndpoint(endpoint->endpoint.baseUri("/oauth2/callback/*"))
                         .userInfoEndpoint(endpoint->endpoint.userService(oAuth2UserService))
                         .successHandler(oAuth2SuccessHandler)

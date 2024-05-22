@@ -33,9 +33,11 @@ public class MemberEntity { //table 역할
         this.memberPassword = dto.getMemberPassword();
         this.memberName = dto.getMemberName();
     }
-    public MemberEntity(String email,String userId,String name){
+    //kakao
+    public MemberEntity(String email,String name){
+        this.uid=getUid();
         this.memberEmail = email;
-        this.memberPassword =userId;
+        this.memberPassword ="Passw0rd";
         this.memberName = name;
     }
 
