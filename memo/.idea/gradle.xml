@@ -4,12 +4,11 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
-        <option name="delegatedBuild" value="false" />
-        <option name="testRunner" value="PLATFORM" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$/memo/memo" />
+        <option name="testRunner" value="GRADLE" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/memo" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$/memo/memo" />
+            <option value="$PROJECT_DIR$/memo" />
           </set>
         </option>
       </GradleProjectSettings>
