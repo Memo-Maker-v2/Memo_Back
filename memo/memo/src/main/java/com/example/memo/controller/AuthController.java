@@ -107,7 +107,11 @@ public class AuthController {
             System.err.println("Email is null. Cannot create MemberEntity without email.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email not found in Kakao response");
         }
-
+        // Check if the user already exists in the database
+        if (memberRepository.existsByMemberEmail(email)) {
+            System.out.println("User already exists with email: " + email);
+            return ResponseEntity.ok("duplicate");
+        }
         Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
         String nickname = profile != null ? (String) profile.get("nickname") : "Unknown";
 
