@@ -15,25 +15,27 @@ import java.time.LocalDate;
 public class VideoDto {
 
     private long videoId;
-
+    //요약본
     private String summary;
-
-    private String document;
-
+    //전체 스크립트
+    private String fullScript;
+    //비디오 url
     @NotBlank
     private String videoUrl;
-
+    //썸네일
     @NotBlank
     private String thumbnailUrl;
-
+    //비디오 제목
     @NotBlank
     private String videoTitle;
-
+    //카테고리
     private String categoryName;
-
+    //필터
+    private String filter;
+    //이메일
     @NotBlank
     private String memberEmail;
-
+    //날짜
     private LocalDate documentDate;
 
     public VideoDto(String videoUrl, String thumbnailUrl, String videoTitle) {
@@ -47,18 +49,9 @@ public class VideoDto {
         this.videoTitle=videoTitle;
         this.categoryName=categoryName;
     }
-    public VideoDto(String videoTitle, String summary, String document, String videoUrl, String memberEmail, LocalDate documentDate) {
+    public VideoDto(String videoTitle, String summary,  String videoUrl, String memberEmail, LocalDate documentDate, String categoryName) {
         this.videoTitle=videoTitle;
         this.summary=summary;
-        this.document=document;
-        this.videoUrl=videoUrl;
-        this.memberEmail=memberEmail;
-        this.documentDate=documentDate;
-    }
-    public VideoDto(String videoTitle, String summary, String document, String videoUrl, String memberEmail, LocalDate documentDate, String categoryName) {
-        this.videoTitle=videoTitle;
-        this.summary=summary;
-        this.document=document;
         this.videoUrl=videoUrl;
         this.memberEmail=memberEmail;
         this.documentDate=documentDate;

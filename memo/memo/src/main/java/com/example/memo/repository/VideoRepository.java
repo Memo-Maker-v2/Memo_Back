@@ -15,9 +15,6 @@ public interface VideoRepository extends JpaRepository<VideoEntity, Long> {
     @Query("SELECT v.videoUrl, v.thumbnailUrl, v.videoTitle, COUNT(v.videoUrl) AS count FROM VideoEntity v GROUP BY v.videoTitle, v.thumbnailUrl, v.videoUrl ORDER BY count DESC")
     List<Object[]> findMostFrequentVideos(Pageable pageable);
 
-    //필기내용 검색 query
-    List<VideoEntity> findVideoByDocumentContainingAndMemberEmail(String keyword, String memberEmail);
-
     VideoEntity findByMemberEmailAndVideoUrl(String memberEmail, String videoUrl);
     VideoEntity findByVideoUrl(String videoUrl);
     //category별 video 검색

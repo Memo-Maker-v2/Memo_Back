@@ -24,9 +24,9 @@ public class VideoEntity {
     @Column
     private String summary;
 
-    /*필기내용*/
+    /*전체 스크립트*/
     @Column
-    private String document;
+    private String fullScript;
 
     /*유튜브영상 url*/
     @Column
@@ -43,6 +43,10 @@ public class VideoEntity {
     /*사용자가 직접 추가하는 카테고리*/
     @Column(name = "category_name")
     private String categoryName;
+
+    /*필터*/
+    @Column
+    private String filter;
 
     @Column(name = "member_email")
     private String memberEmail;

@@ -51,7 +51,6 @@ public class VideoService {
         }
         VideoEntity videoEntity = new VideoEntity();
         videoEntity.setSummary(videoDto.getSummary());
-        videoEntity.setDocument(videoDto.getDocument());
         videoEntity.setVideoUrl(videoDto.getVideoUrl());
         videoEntity.setThumbnailUrl(videoDto.getThumbnailUrl());
         videoEntity.setVideoTitle(videoDto.getVideoTitle());
@@ -60,17 +59,6 @@ public class VideoService {
         return videoRepository.save(videoEntity);
     }
 
-    //document 내용 추가
-    @Transactional
-    public VideoEntity updateDocument(String memberEmail, String videoUrl, String newDocument, LocalDate documentDate) throws Exception {
-        VideoEntity video = videoRepository.findByMemberEmailAndVideoUrl(memberEmail, videoUrl);
-        if (video == null) {
-            throw new Exception("Video not found with provided email and URL");
-        }
-        video.setDocument(newDocument);
-        video.setDocumentDate(documentDate);
-        return videoRepository.save(video);
-    }
 
     //가장 많이 검색된 video 3개
     @Transactional(readOnly = true)
@@ -80,11 +68,6 @@ public class VideoService {
         return results.stream()
                 .map(result -> new VideoDto((String) result[0], (String) result[1], (String) result[2]))
                 .collect(Collectors.toList());
-    }
-    //필기내용 검색
-    @Transactional(readOnly = true)
-    public List<VideoEntity> searchVideosByKeywordAndMemberEmail(String keyword, String memberEmail) {
-        return videoRepository.findVideoByDocumentContainingAndMemberEmail(keyword, memberEmail);
     }
     //video 삭제
     @Transactional
@@ -109,7 +92,7 @@ public class VideoService {
                 .map(q -> new QuestionDto(q.getQuestion(), q.getAnswer(),q.getMemberEmail(),q.getVideoUrl()))
                 .collect(Collectors.toList());
 
-        VideoDto videoDto = new VideoDto(video.getVideoTitle(),video.getSummary(), video.getDocument(),video.getVideoUrl(),video.getMemberEmail(), video.getDocumentDate(), video.getCategoryName());
+        VideoDto videoDto = new VideoDto(video.getVideoTitle(),video.getSummary(), video.getVideoUrl(),video.getMemberEmail(), video.getDocumentDate(), video.getCategoryName());
         return new VideoAndQuestionDto(videoDto, questionDtos);
     }
     //categoryName과 memberEmail로 영상 조회
