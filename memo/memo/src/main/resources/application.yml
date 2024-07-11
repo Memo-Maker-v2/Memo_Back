@@ -1,9 +1,9 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://memo-mysql.c1ko8y4e4uag.ap-northeast-2.rds.amazonaws.com:3306/mydb
+    url: jdbc:mysql://localhost:3306/memo?&serverTimezone=Asia/Seoul
     username: root
-    password: lkcc0411!
+    password: 1234
   jpa:
     hibernate:
       ddl-auto: update
@@ -17,7 +17,6 @@ spring:
           kakao:
             client-id: 7fe1ea9a36e18292e75a035b08876a9a
             client-secret: 6bG35etxsDkS0M2Us5JxDQXerFZJ3imd
-#            redirect-uri: "http://localhost:3000/auth"
             redirect-uri: "http://localhost:3000/auth"
             authorization-grant-type: authorization_code
             client-authentication-method: client_secret_post
