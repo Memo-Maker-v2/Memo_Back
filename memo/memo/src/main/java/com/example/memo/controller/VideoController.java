@@ -39,41 +39,7 @@ public class VideoController {
     public VideoEntity saveVideo(@RequestBody VideoDto videoDto) throws Exception{
         return videoService.saveVideo(videoDto);
     }
-    //document내용 저장
-    @PatchMapping("/document-save")
-    @CrossOrigin("*")
-    public ResponseEntity<?> updateDocument(@RequestBody VideoDocumentUpdateDto videoDocumentDto) {
-        try {
-            VideoEntity updatedVideo = videoService.updateDocument(
-                    videoDocumentDto.getMemberEmail(),
-                    videoDocumentDto.getVideoUrl(),
-                    videoDocumentDto.getDocument(),
-                    videoDocumentDto.getDocumentDate()
-            );
-            return ResponseEntity.ok(updatedVideo);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
 
-    }
-    //필기내용 검색
-    @PostMapping("/search")
-    @CrossOrigin("*")
-    public ResponseEntity<?> searchVideosByKeywordAndMemberEmail(@RequestBody Map<String, String> requestBody) {
-        String keyword = requestBody.get("keyword");
-        String memberEmail = requestBody.get("memberEmail");
-
-        if (memberEmail == null || memberEmail.isEmpty()) {
-            return ResponseEntity.badRequest().body("Member email is required.");
-        }
-
-        List<VideoEntity> videos = videoService.searchVideosByKeywordAndMemberEmail(keyword, memberEmail);
-        if (!videos.isEmpty()) {
-            return ResponseEntity.ok(videos);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
     //video 삭제
     @DeleteMapping("delete-video/{videoId}")
     @CrossOrigin("*")
