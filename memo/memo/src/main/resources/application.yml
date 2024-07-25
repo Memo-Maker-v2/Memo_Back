@@ -34,3 +34,4 @@ spring:
 
 
 secret-key: ThisStatementIsJwtSecretKeyDoNotUseThisStatement;
+youtube.api.key: "AIzaSyBwTC375RADOCR3CNB5mtuaObkLyO9rPyY"
