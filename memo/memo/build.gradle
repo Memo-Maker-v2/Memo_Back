@@ -53,6 +53,9 @@ dependencies {
 
 	// Spring Boot Test Starter
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// Google Cloud Speech-to-Text API
+
 }
 
 tasks.named('test') {

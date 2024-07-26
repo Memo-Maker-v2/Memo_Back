@@ -20,11 +20,13 @@ public class YoutubeController {
       // 요청 데이터 콘솔에 출력
       System.out.println("Received URL: " + requestDto.getUrl());
       
-      // 비디오 제목과 자막 가져오기
+      // 비디오 제목 가져오기 및 오디오 다운로드
       return youtubeService.getVideoDetails(requestDto.getUrl());
     } catch (Exception e) {
       e.printStackTrace();
       throw new RuntimeException("Error processing the request.");
     }
   }
+  
+  
 }
