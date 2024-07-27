@@ -54,6 +54,10 @@ dependencies {
 	// Spring Boot Test Starter
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
+	implementation 'org.seleniumhq.selenium:selenium-java:4.22.0'
+	implementation 'io.github.bonigarcia:webdrivermanager:5.9.0'
+	implementation 'org.jsoup:jsoup:1.16.1'
+
 	// Google Cloud Speech-to-Text API
 
 }

@@ -1,96 +1,152 @@
 package com.example.memo.service;
 
-import com.example.memo.dto.YoutubeResponseDto;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Value;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.Scanner;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.time.Duration;
+import java.util.List;
 
 @Service
 public class YoutubeService {
   
-  @Value("${youtube.api.key}")
-  private String apiKey;
-  
-  // 비디오 제목을 가져오는 메서드
-  public String getVideoTitle(String videoUrl) throws IOException {
-    String videoId = extractVideoId(videoUrl);
-    String apiUrl = "https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" + videoId + "&key=" + apiKey;
+  public void openYoutubeUrl(String url) throws IOException {
+    WebDriver driver = initializeWebDriver();
     
-    RestTemplate restTemplate = new RestTemplate();
-    String response = restTemplate.getForObject(apiUrl, String.class);
-    
-    JSONObject jsonResponse = new JSONObject(response);
-    JSONArray items = jsonResponse.getJSONArray("items");
-    if (items.length() > 0) {
-      JSONObject snippet = items.getJSONObject(0).getJSONObject("snippet");
-      String title = snippet.getString("title");
-      System.out.println("Video Title: " + title);  // 비디오 제목 출력
-      return title;
-    } else {
-      throw new RuntimeException("No video found with the provided URL.");
+    try {
+      // URL 열기
+      driver.get(url);
+      
+      // 페이지 로딩 대기
+      waitForPageLoad(driver);
+      
+      // "더보기" 버튼 클릭
+      clickMoreButton(driver);
+      
+      // 버튼 클릭 후 일정 시간 대기
+      sleepWithExceptionHandling(2000); // 2초 대기
+      
+      // "스크립트 표시" 버튼 클릭
+      clickScriptButton(driver);
+      
+      // 자막 추출
+      extractTranscript(driver);
+      
+      // 마지막 버튼 클릭 후 3초 대기
+      sleepWithExceptionHandling(3000); // 3초 대기
+    } finally {
+      // WebDriver 종료
+      System.out.println("Closing WebDriver");
+      closeBrowser(driver);
     }
   }
   
-  // 비디오를 오디오 파일로 다운로드하는 메서드
-  public void downloadAudio(String videoUrl) throws IOException, InterruptedException {
-    String title = getVideoTitle(videoUrl).replaceAll("[^\\p{IsAlphabetic}\\p{IsDigit}\\-_. ]", "_"); // 파일명으로 사용할 수 없는 문자를 _로 변환
-    String videoId = extractVideoId(videoUrl);
+  // WebDriver 초기화 메소드
+  private WebDriver initializeWebDriver() throws IOException {
+    Path tempDir = Files.createTempDirectory("selenium");
+    InputStream chromedriverStream = getClass().getClassLoader().getResourceAsStream("drivers/chromedriver.exe");
     
-    // yt-dlp 명령어 구성
-    String command = "yt-dlp -x --audio-format mp3 -o \"" + title + ".%(ext)s\" https://www.youtube.com/watch?v=" + videoId;
-    
-    // ProcessBuilder를 사용하여 외부 명령어 실행
-    ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", command);
-    Process process = processBuilder.start();
-    
-    // 프로세스 출력 스트림 읽기
-    try (Scanner scanner = new Scanner(process.getInputStream())) {
-      while (scanner.hasNextLine()) {
-        System.out.println(scanner.nextLine());
-      }
+    if (chromedriverStream == null) {
+      throw new RuntimeException("Chromedriver binary not found in resources.");
     }
     
-    // 프로세스 오류 스트림 읽기
-    try (Scanner errorScanner = new Scanner(process.getErrorStream())) {
-      while (errorScanner.hasNextLine()) {
-        System.err.println(errorScanner.nextLine());
-      }
-    }
+    File tempFile = new File(tempDir.toFile(), "chromedriver.exe");
+    Files.copy(chromedriverStream, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    chromedriverStream.close();
     
-    // 프로세스 종료 코드 확인
-    int exitCode = process.waitFor();
-    if (exitCode != 0) {
-      throw new RuntimeException("Failed to download audio. Exit code: " + exitCode);
-    }
+    System.setProperty("webdriver.chrome.driver", tempFile.getAbsolutePath());
     
-    System.out.println("Audio download completed for video: " + title);  // 다운로드 완료 메시지 출력
+    ChromeOptions chromeOptions = new ChromeOptions();
+    chromeOptions.addArguments("--start-maximized");
+    chromeOptions.addArguments("--disable-gpu");
+    chromeOptions.addArguments("--no-sandbox");
+//    chromeOptions.addArguments("--headless"); // 헤드리스 모드 제거
+    
+    return new ChromeDriver(chromeOptions);
   }
   
-  // 비디오의 제목을 가져오고 오디오를 다운로드하는 메서드
-  public YoutubeResponseDto getVideoDetails(String videoUrl) throws IOException, InterruptedException {
-    String title = getVideoTitle(videoUrl);
-    downloadAudio(videoUrl);
-    System.out.println("Service completed for video: " + title);  // 서비스 완료 메시지 출력
-    return new YoutubeResponseDto(title, ""); // 자막은 사용하지 않으므로 빈 문자열 반환
+  // 페이지 로딩 대기 메소드
+  private void waitForPageLoad(WebDriver driver) {
+    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
   }
   
-  // 비디오 URL에서 비디오 ID를 추출하는 메서드
-  private String extractVideoId(String videoUrl) {
-    String[] parts = videoUrl.split("v=");
-    if (parts.length > 1) {
-      String videoId = parts[1];
-      int ampersandIndex = videoId.indexOf("&");
-      if (ampersandIndex != -1) {
-        videoId = videoId.substring(0, ampersandIndex);
+  // "더보기" 버튼 클릭 메소드
+  private void clickMoreButton(WebDriver driver) {
+    try {
+      WebElement moreButton = driver.findElement(By.cssSelector("tp-yt-paper-button#expand"));
+      moreButton.click();
+      System.out.println("Clicked 'More' button");
+    } catch (Exception e) {
+      System.err.println("Failed to find or click 'More' button: " + e.getMessage());
+    }
+  }
+  
+  // "스크립트 표시" 버튼 클릭 메소드
+  private void clickScriptButton(WebDriver driver) {
+    try {
+      WebElement scriptButton = driver.findElement(By.cssSelector("button[aria-label='스크립트 표시']"));
+      scriptButton.click();
+      System.out.println("Clicked '스크립트 표시' button");
+    } catch (Exception e) {
+      System.err.println("Failed to find or click '스크립트 표시' button: " + e.getMessage());
+    }
+  }
+  
+  // 자막 추출 메소드
+  private void extractTranscript(WebDriver driver) {
+    try {
+      // 자막 요소 찾기
+      List<WebElement> transcriptSegments = driver.findElements(By.cssSelector("ytd-transcript-segment-renderer"));
+      
+      // 전체 자막을 저장할 StringBuilder
+      StringBuilder transcriptBuilder = new StringBuilder();
+      
+      for (WebElement segment : transcriptSegments) {
+        // 시간 추출
+        WebElement timestampElement = segment.findElement(By.cssSelector(".segment-start-offset .segment-timestamp"));
+        String timestamp = timestampElement.getText();
+        
+        // 텍스트 추출
+        WebElement textElement = segment.findElement(By.cssSelector(".segment-text"));
+        String text = textElement.getText();
+        
+        // 출력
+        System.out.println("Timestamp: " + timestamp + " | Text: " + text);
+        
+        // 자막을 한 덩어리로 추가
+        transcriptBuilder.append("Timestamp: ").append(timestamp).append(" | Text: ").append(text).append("\n");
       }
-      return videoId;
-    } else {
-      throw new IllegalArgumentException("Invalid video URL");
+      
+//      // 전체 자막 출력
+//      System.out.println("Transcript:\n" + transcriptBuilder.toString());
+    } catch (Exception e) {
+      System.err.println("Failed to extract transcript: " + e.getMessage());
+    }
+  }
+  
+  
+  // WebDriver를 종료하는 메소드
+  private void closeBrowser(WebDriver driver) {
+    if (driver != null) {
+      driver.quit();
+    }
+  }
+  
+  // 대기 메소드 (예외 처리 포함)
+  private void sleepWithExceptionHandling(int milliseconds) {
+    try {
+      Thread.sleep(milliseconds);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt(); // 현재 스레드의 인터럽트 상태를 복원
     }
   }
 }
