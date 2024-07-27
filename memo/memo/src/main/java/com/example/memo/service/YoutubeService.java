@@ -1,12 +1,13 @@
 package com.example.memo.service;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.stereotype.Service;
-
+import org.openqa.selenium.Dimension;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +27,9 @@ public class YoutubeService {
       // URL 열기
       driver.get(url);
       
+      // 동적으로 브라우저 크기 조정
+      driver.manage().window().setSize(new Dimension(1920, 1080));
+      
       // 페이지 로딩 대기
       waitForPageLoad(driver);
       
@@ -40,6 +44,9 @@ public class YoutubeService {
       
       // 자막 추출
       extractTranscript(driver);
+      
+      // 자막 언어 추출
+      extractSubtitleLanguage(driver);
       
       // 마지막 버튼 클릭 후 3초 대기
       sleepWithExceptionHandling(3000); // 3초 대기
@@ -66,10 +73,11 @@ public class YoutubeService {
     System.setProperty("webdriver.chrome.driver", tempFile.getAbsolutePath());
     
     ChromeOptions chromeOptions = new ChromeOptions();
-    chromeOptions.addArguments("--start-maximized");
+//    chromeOptions.addArguments("--start-maximized");
+//    chromeOptions.addArguments("--window-size=1920,1080");
     chromeOptions.addArguments("--disable-gpu");
     chromeOptions.addArguments("--no-sandbox");
-//    chromeOptions.addArguments("--headless"); // 헤드리스 모드 제거
+    chromeOptions.addArguments("--headless"); // headless 모드 활성화
     
     return new ChromeDriver(chromeOptions);
   }
@@ -94,6 +102,10 @@ public class YoutubeService {
   private void clickScriptButton(WebDriver driver) {
     try {
       WebElement scriptButton = driver.findElement(By.cssSelector("button[aria-label='스크립트 표시']"));
+      
+      // 요소가 화면에 보이도록 스크롤
+      ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", scriptButton);
+      
       scriptButton.click();
       System.out.println("Clicked '스크립트 표시' button");
     } catch (Exception e) {
@@ -125,11 +137,25 @@ public class YoutubeService {
         // 자막을 한 덩어리로 추가
         transcriptBuilder.append("Timestamp: ").append(timestamp).append(" | Text: ").append(text).append("\n");
       }
-      
+
 //      // 전체 자막 출력
 //      System.out.println("Transcript:\n" + transcriptBuilder.toString());
     } catch (Exception e) {
       System.err.println("Failed to extract transcript: " + e.getMessage());
+    }
+  }
+  
+  // 자막 언어 추출 메소드
+  private void extractSubtitleLanguage(WebDriver driver) {
+    try {
+      // 자막 언어 요소 찾기
+      WebElement languageElement = driver.findElement(By.cssSelector("div#label-text.style-scope.yt-dropdown-menu"));
+      
+      // 텍스트 추출
+      String languageText = languageElement.getText();
+      System.out.println("Subtitle Language: " + languageText);
+    } catch (Exception e) {
+      System.err.println("Failed to extract subtitle language: " + e.getMessage());
     }
   }
   
