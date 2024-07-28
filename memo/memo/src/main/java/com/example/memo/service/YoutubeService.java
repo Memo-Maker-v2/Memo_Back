@@ -21,6 +21,11 @@ import java.util.List;
 public class YoutubeService {
   
   public void openYoutubeUrl(String url) throws IOException {
+    // URL이 쇼츠 URL인지 확인하고 일반 URL로 변환
+    if (url.contains("youtube.com/shorts/")) {
+      url = url.replace("youtube.com/shorts/", "youtube.com/watch?v=");
+    }
+    
     WebDriver driver = initializeWebDriver();
     
     try {
@@ -159,6 +164,10 @@ public class YoutubeService {
       
       // 텍스트 추출
       String languageText = languageElement.getText();
+      
+      // "자동 생성됨" 텍스트 제거
+      languageText = languageText.replace(" (자동 생성됨)", "");
+      
       System.out.println("Subtitle Language: " + languageText);
     } catch (Exception e) {
       System.err.println("Failed to extract subtitle language: " + e.getMessage());
