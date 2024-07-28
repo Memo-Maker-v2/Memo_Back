@@ -50,6 +50,10 @@ public class YoutubeService {
       
       // 마지막 버튼 클릭 후 3초 대기
       sleepWithExceptionHandling(3000); // 3초 대기
+    } catch (Exception e) {
+      // 오류가 발생하면 크롬 창 종료
+      System.err.println("An error occurred: " + e.getMessage());
+      closeBrowser(driver);
     } finally {
       // WebDriver 종료
       System.out.println("Closing WebDriver");
@@ -106,7 +110,9 @@ public class YoutubeService {
       // 요소가 화면에 보이도록 스크롤
       ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", scriptButton);
       
-      scriptButton.click();
+      // JavaScript Executor를 사용하여 클릭
+      ((JavascriptExecutor) driver).executeScript("arguments[0].click();", scriptButton);
+      
       System.out.println("Clicked '스크립트 표시' button");
     } catch (Exception e) {
       System.err.println("Failed to find or click '스크립트 표시' button: " + e.getMessage());
