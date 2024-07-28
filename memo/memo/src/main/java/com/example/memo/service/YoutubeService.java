@@ -1,13 +1,16 @@
 package com.example.memo.service;
 
+import com.example.memo.common.OpenAIUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.openqa.selenium.Dimension;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +23,10 @@ import java.util.List;
 @Service
 public class YoutubeService {
   
+  @Autowired
+  private OpenAIUtils openAIUtils;
+  
+  // 유튜브 URL을 열고 자막을 추출한 뒤 요약본을 생성하는 메소드
   public void openYoutubeUrl(String url) throws IOException {
     // URL이 쇼츠 URL인지 확인하고 일반 URL로 변환
     if (url.contains("youtube.com/shorts/")) {
@@ -48,13 +55,17 @@ public class YoutubeService {
       clickScriptButton(driver);
       
       // 자막 추출
-      extractTranscript(driver);
+      String transcript = extractTranscript(driver);
       
       // 자막 언어 추출
-      extractSubtitleLanguage(driver);
+      String subtitleLanguage = extractSubtitleLanguage(driver);
       
       // 마지막 버튼 클릭 후 3초 대기
       sleepWithExceptionHandling(3000); // 3초 대기
+      
+      // 자막을 GPT-3.5-turbo를 통해 요약본 생성
+      generateSummary(transcript, subtitleLanguage);
+      
     } catch (Exception e) {
       // 오류가 발생하면 크롬 창 종료
       System.err.println("An error occurred: " + e.getMessage());
@@ -82,9 +93,7 @@ public class YoutubeService {
     System.setProperty("webdriver.chrome.driver", tempFile.getAbsolutePath());
     
     ChromeOptions chromeOptions = new ChromeOptions();
-//    chromeOptions.addArguments("--start-maximized");
-//    chromeOptions.addArguments("--window-size=1920,1080");
-    chromeOptions.addArguments("--disable-gpu");
+    chromeOptions.addArguments("--disable-gpu"); // GPU 가속 끄기
     chromeOptions.addArguments("--no-sandbox");
     chromeOptions.addArguments("--headless"); // headless 모드 활성화
     
@@ -125,69 +134,67 @@ public class YoutubeService {
   }
   
   // 자막 추출 메소드
-  private void extractTranscript(WebDriver driver) {
+  private String extractTranscript(WebDriver driver) {
+    StringBuilder transcriptBuilder = new StringBuilder();
     try {
-      // 자막 요소 찾기
       List<WebElement> transcriptSegments = driver.findElements(By.cssSelector("ytd-transcript-segment-renderer"));
       
-      // 전체 자막을 저장할 StringBuilder
-      StringBuilder transcriptBuilder = new StringBuilder();
-      
       for (WebElement segment : transcriptSegments) {
-        // 시간 추출
         WebElement timestampElement = segment.findElement(By.cssSelector(".segment-start-offset .segment-timestamp"));
-        String timestamp = timestampElement.getText();
-        
-        // 텍스트 추출
+        String ts = timestampElement.getText();
         WebElement textElement = segment.findElement(By.cssSelector(".segment-text"));
-        String text = textElement.getText();
+        String txt = textElement.getText();
         
-        // 출력
-        System.out.println("Timestamp: " + timestamp + " | Text: " + text);
-        
-        // 자막을 한 덩어리로 추가
-        transcriptBuilder.append("Timestamp: ").append(timestamp).append(" | Text: ").append(text).append("\n");
+        transcriptBuilder.append("TS: ").append(ts).append(" | TXT: ").append(txt).append("\n");
       }
-
-//      // 전체 자막 출력
-//      System.out.println("Transcript:\n" + transcriptBuilder.toString());
+      
+      String transcript = transcriptBuilder.toString();
+      System.out.println("Extracted FULL Transcript: \n" + transcript); // 로그 추가
+      return transcript;
+      
     } catch (Exception e) {
       System.err.println("Failed to extract transcript: " + e.getMessage());
     }
+    return "";
   }
   
   // 자막 언어 추출 메소드
-  private void extractSubtitleLanguage(WebDriver driver) {
+  private String extractSubtitleLanguage(WebDriver driver) {
     try {
-      // 자막 언어 요소 찾기
       WebElement languageElement = driver.findElement(By.cssSelector("div#label-text.style-scope.yt-dropdown-menu"));
-      
-      // 텍스트 추출
       String languageText = languageElement.getText();
-      
-      // "자동 생성됨" 텍스트 제거
-      languageText = languageText.replace(" (자동 생성됨)", "");
-      
+      languageText = languageText.replace(" (자동 생성됨)", "");  // "자동 생성됨" 텍스트 제거
       System.out.println("Subtitle Language: " + languageText);
+      return languageText;
     } catch (Exception e) {
       System.err.println("Failed to extract subtitle language: " + e.getMessage());
+      return "Unknown";
     }
   }
   
+  // 자막을 GPT-3.5-turbo API를 통해 요약본을 생성하는 메소드
+  public void generateSummary(String transcript, String subtitleLanguage) {
+    try {
+      String summary = openAIUtils.summarizeTranscript(transcript, subtitleLanguage);
+      System.out.println("Generated Summary in " + subtitleLanguage + ": \n" + summary);
+    } catch (IOException e) {
+      System.err.println("Failed to generate summary: " + e.getMessage());
+    }
+  }
   
-  // WebDriver를 종료하는 메소드
+  // 브라우저 종료 메소드
   private void closeBrowser(WebDriver driver) {
     if (driver != null) {
       driver.quit();
     }
   }
   
-  // 대기 메소드 (예외 처리 포함)
-  private void sleepWithExceptionHandling(int milliseconds) {
+  // 예외 처리를 포함한 대기 메소드
+  private void sleepWithExceptionHandling(long millis) {
     try {
-      Thread.sleep(milliseconds);
+      Thread.sleep(millis);
     } catch (InterruptedException e) {
-      Thread.currentThread().interrupt(); // 현재 스레드의 인터럽트 상태를 복원
+      Thread.currentThread().interrupt();
     }
   }
 }
