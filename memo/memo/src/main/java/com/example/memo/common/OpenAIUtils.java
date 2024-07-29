@@ -29,8 +29,8 @@ public class OpenAIUtils {
     // 시스템 메시지 추가
     JSONObject systemMessage = new JSONObject();
     systemMessage.put("role", "system");
-    systemMessage.put("content", "Please analyze the following transcript and provide a summary with subheadings and brief descriptions in " + language + ". Include appropriate icons with the subheadings and descriptions without an introduction or closing remark.");
-    
+    systemMessage.put("content", "Please analyze the following transcript and provide a summary with subheadings and brief descriptions in " + language + ". Include appropriate emojis with the subheadings and descriptions without an introduction or closing remark.");
+
     // 사용자 메시지 추가
     JSONObject userMessage = new JSONObject();
     userMessage.put("role", "user");

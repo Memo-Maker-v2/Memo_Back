@@ -1,15 +1,18 @@
 package com.example.memo.service;
 
 import com.example.memo.common.OpenAIUtils;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import com.example.memo.dto.YoutubeRequestDto;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.openqa.selenium.Dimension;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,8 +29,13 @@ public class YoutubeService {
   @Autowired
   private OpenAIUtils openAIUtils;
   
+  @Value("${youtube.api.key}")
+  private String apiKey;
+  
+  private final OkHttpClient httpClient = new OkHttpClient();
+  
   // 유튜브 URL을 열고 자막을 추출한 뒤 요약본을 생성하는 메소드
-  public void openYoutubeUrl(String url) throws IOException {
+  public void openYoutubeUrl(String url) throws IOException, JSONException {
     // URL이 쇼츠 URL인지 확인하고 일반 URL로 변환
     if (url.contains("youtube.com/shorts/")) {
       url = url.replace("youtube.com/shorts/", "youtube.com/watch?v=");
@@ -36,6 +44,12 @@ public class YoutubeService {
     WebDriver driver = initializeWebDriver();
     
     try {
+      // 유튜브 비디오 제목 출력
+      getVideoTitle(url);
+      
+      // 유튜브 썸네일 URL 출력
+      getThumbnailUrl(url);
+      
       // URL 열기
       driver.get(url);
       
@@ -164,7 +178,7 @@ public class YoutubeService {
       WebElement languageElement = driver.findElement(By.cssSelector("div#label-text.style-scope.yt-dropdown-menu"));
       String languageText = languageElement.getText();
       languageText = languageText.replace(" (자동 생성됨)", "");  // "자동 생성됨" 텍스트 제거
-      System.out.println("Subtitle Language: " + languageText);
+      System.out.println("자막 언어: " + languageText);
       return languageText;
     } catch (Exception e) {
       System.err.println("Failed to extract subtitle language: " + e.getMessage());
@@ -195,6 +209,68 @@ public class YoutubeService {
       Thread.sleep(millis);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
+    }
+  }
+  
+  // 유튜브 영상 제목 가져오기 메소드
+  public String getVideoTitle(String videoUrl) throws IOException, JSONException {
+    String videoId = extractVideoId(videoUrl);
+    String apiUrl = "https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" + videoId + "&key=" + apiKey;
+    
+    Request request = new Request.Builder()
+            .url(apiUrl)
+            .build();
+    
+    try (Response response = httpClient.newCall(request).execute()) {
+      if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+      
+      JSONObject jsonResponse = new JSONObject(response.body().string());
+      String title = jsonResponse.getJSONArray("items")
+              .getJSONObject(0)
+              .getJSONObject("snippet")
+              .getString("title");
+      
+      // 제목을 출력
+      System.out.println("Video Title: " + title);
+      
+      return title;
+    }
+  }
+  
+  // 유튜브 썸네일 이미지 주소 가져오기 메소드
+  public String getThumbnailUrl(String videoUrl) throws IOException, JSONException {
+    String videoId = extractVideoId(videoUrl);
+    String apiUrl = "https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" + videoId + "&key=" + apiKey;
+    
+    Request request = new Request.Builder()
+            .url(apiUrl)
+            .build();
+    
+    try (Response response = httpClient.newCall(request).execute()) {
+      if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+      
+      JSONObject jsonResponse = new JSONObject(response.body().string());
+      String thumbnailUrl = jsonResponse.getJSONArray("items")
+              .getJSONObject(0)
+              .getJSONObject("snippet")
+              .getJSONObject("thumbnails")
+              .getJSONObject("high")  // 썸네일의 품질을 선택 ("default", "medium", "high")
+              .getString("url");
+      
+      // 썸네일 URL을 출력
+      System.out.println("Thumbnail URL: " + thumbnailUrl);
+      
+      return thumbnailUrl;
+    }
+  }
+  
+  // 유튜브 URL에서 비디오 ID 추출
+  private String extractVideoId(String videoUrl) {
+    String[] parts = videoUrl.split("v=");
+    if (parts.length > 1) {
+      return parts[1];
+    } else {
+      throw new IllegalArgumentException("Invalid YouTube URL");
     }
   }
 }
