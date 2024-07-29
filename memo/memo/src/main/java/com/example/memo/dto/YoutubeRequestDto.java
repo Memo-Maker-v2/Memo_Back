@@ -8,4 +8,5 @@ import lombok.Setter;
 public class YoutubeRequestDto {
   private String url;
   private String title;
+  private String memberEmail;
 }

@@ -1,7 +1,7 @@
 package com.example.memo.service;
 
 import com.example.memo.common.OpenAIUtils;
-import com.example.memo.dto.YoutubeRequestDto;
+import com.example.memo.dto.YoutubeResponseDto;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -21,6 +21,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -34,61 +36,50 @@ public class YoutubeService {
   
   private final OkHttpClient httpClient = new OkHttpClient();
   
-  // 유튜브 URL을 열고 자막을 추출한 뒤 요약본을 생성하는 메소드
-  public void openYoutubeUrl(String url) throws IOException, JSONException {
-    // URL이 쇼츠 URL인지 확인하고 일반 URL로 변환
+  // 유튜브 URL을 열고 자막을 추출한 뒤 요약본을 생성하고 DTO로 반환하는 메소드
+  public YoutubeResponseDto processYoutubeUrl(String url, String memberEmail) throws IOException, JSONException {
     if (url.contains("youtube.com/shorts/")) {
       url = url.replace("youtube.com/shorts/", "youtube.com/watch?v=");
     }
     
     WebDriver driver = initializeWebDriver();
+    String videoTitle = "";
+    String thumbnailUrl = "";
+    String fullScript = "";
+    String summary = "";
+    String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     
     try {
-      // 유튜브 비디오 제목 출력
-      getVideoTitle(url);
-      
-      // 유튜브 썸네일 URL 출력
-      getThumbnailUrl(url);
+      // 비디오 제목과 썸네일 URL 가져오기
+      videoTitle = getVideoTitle(url);
+      thumbnailUrl = getThumbnailUrl(url);
       
       // URL 열기
       driver.get(url);
-      
-      // 동적으로 브라우저 크기 조정
       driver.manage().window().setSize(new Dimension(1920, 1080));
-      
-      // 페이지 로딩 대기
       waitForPageLoad(driver);
       
       // "더보기" 버튼 클릭
       clickMoreButton(driver);
-      
-      // 버튼 클릭 후 일정 시간 대기
-      sleepWithExceptionHandling(2000); // 2초 대기
+      sleepWithExceptionHandling(2000);
       
       // "스크립트 표시" 버튼 클릭
       clickScriptButton(driver);
       
       // 자막 추출
-      String transcript = extractTranscript(driver);
-      
-      // 자막 언어 추출
+      fullScript = extractTranscript(driver);
       String subtitleLanguage = extractSubtitleLanguage(driver);
       
-      // 마지막 버튼 클릭 후 3초 대기
-      sleepWithExceptionHandling(3000); // 3초 대기
-      
       // 자막을 GPT-3.5-turbo를 통해 요약본 생성
-      generateSummary(transcript, subtitleLanguage);
+      summary = openAIUtils.summarizeTranscript(fullScript, subtitleLanguage);
       
     } catch (Exception e) {
-      // 오류가 발생하면 크롬 창 종료
       System.err.println("An error occurred: " + e.getMessage());
-      closeBrowser(driver);
     } finally {
-      // WebDriver 종료
-      System.out.println("Closing WebDriver");
       closeBrowser(driver);
     }
+    
+    return new YoutubeResponseDto(videoTitle, fullScript, url, thumbnailUrl, summary, memberEmail, date);
   }
   
   // WebDriver 초기화 메소드
@@ -162,9 +153,9 @@ public class YoutubeService {
         transcriptBuilder.append("TS: ").append(ts).append(" | TXT: ").append(txt).append("\n");
       }
       
-      String transcript = transcriptBuilder.toString();
-      System.out.println("Extracted FULL Transcript: \n" + transcript); // 로그 추가
-      return transcript;
+      String fullScript = transcriptBuilder.toString();
+      System.out.println("Extracted FULL Transcript: \n" + fullScript); // 로그 추가
+      return fullScript;
       
     } catch (Exception e) {
       System.err.println("Failed to extract transcript: " + e.getMessage());
@@ -232,6 +223,12 @@ public class YoutubeService {
       
       // 제목을 출력
       System.out.println("Video Title: " + title);
+      
+      // 현재 날짜 출력
+      LocalDate currentDate = LocalDate.now();
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+      String formattedDate = currentDate.format(formatter);
+      System.out.println("Current Date: " + formattedDate);
       
       return title;
     }
