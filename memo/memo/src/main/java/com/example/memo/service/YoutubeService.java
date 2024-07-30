@@ -71,7 +71,7 @@ public class YoutubeService {
       String subtitleLanguage = extractSubtitleLanguage(driver);
       
       // 자막을 GPT-3.5-turbo를 통해 요약본 생성
-      summary = openAIUtils.summarizeTranscript(fullScript, subtitleLanguage);
+      summary = generateSummary(fullScript, subtitleLanguage);
       
     } catch (Exception e) {
       System.err.println("An error occurred: " + e.getMessage());
@@ -178,12 +178,14 @@ public class YoutubeService {
   }
   
   // 자막을 GPT-3.5-turbo API를 통해 요약본을 생성하는 메소드
-  public void generateSummary(String transcript, String subtitleLanguage) {
+  public String generateSummary(String transcript, String subtitleLanguage) {
     try {
       String summary = openAIUtils.summarizeTranscript(transcript, subtitleLanguage);
       System.out.println("Generated Summary in " + subtitleLanguage + ": \n" + summary);
+      return summary;
     } catch (IOException e) {
       System.err.println("Failed to generate summary: " + e.getMessage());
+      return "Summary generation failed.";
     }
   }
   
