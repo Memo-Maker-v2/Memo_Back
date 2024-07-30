@@ -1,14 +1,13 @@
 package com.example.memo.controller;
 
-import com.example.memo.dto.*;
+import com.example.memo.dto.video.VideoAndQuestionDto;
+import com.example.memo.dto.video.VideoDto;
 import com.example.memo.entity.VideoEntity;
 import com.example.memo.service.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,18 +38,7 @@ public class VideoController {
     public VideoEntity saveVideo(@RequestBody VideoDto videoDto) throws Exception{
         return videoService.saveVideo(videoDto);
     }
-
-    //video 삭제
-    @DeleteMapping("delete-video/{videoId}")
-    @CrossOrigin("*")
-    public ResponseEntity<Void> deleteCategory(@PathVariable("videoId") long videoId) {
-        if (videoService.deleteVideo(videoId)) {
-            return ResponseEntity.ok().build(); // 성공적으로 삭제되면 200 OK 응답
-        } else {
-            return ResponseEntity.notFound().build(); // 해당 ID의 카테고리가 없는 경우 404 Not Found 응답
-        }
-    }
-    //category page에서 영상 클릭했을 때 영상 정보 불러옴
+    //영상 클릭했을 때 영상 정보 불러옴
     @PostMapping("select-video")
     @CrossOrigin("*")
     public ResponseEntity<VideoAndQuestionDto> fetchVideoAndQuestions(@RequestBody VideoDto videoRequest) {
@@ -58,6 +46,43 @@ public class VideoController {
             VideoAndQuestionDto videoAndQuestions = videoService.fetchVideoAndQuestions(videoRequest.getMemberEmail(), videoRequest.getVideoUrl());
             return ResponseEntity.ok(videoAndQuestions);
         } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    // videoUrl과 memberEmail을 사용하여 FullScript 데이터를 가져옴
+    @PostMapping("/fullscript")
+    @CrossOrigin("*")
+    public ResponseEntity<String> getFullScript(@RequestBody Map<String, String> requestBody) {
+        String memberEmail = requestBody.get("memberEmail");
+        String videoUrl = requestBody.get("videoUrl");
+
+        if (memberEmail == null || videoUrl == null) {
+            return ResponseEntity.badRequest().body("Missing memberEmail or videoUrl");
+        }
+
+        try {
+            String fullScript = videoService.getFullScriptByMemberEmailAndVideoUrl(memberEmail, videoUrl);
+            return ResponseEntity.ok(fullScript);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    // 비디오의 filter 정보를 업데이트
+    @PutMapping("/update-filter")
+    @CrossOrigin("*")
+    public ResponseEntity<String> updateVideoFilter(@RequestBody Map<String, String> requestBody) {
+        String memberEmail = requestBody.get("memberEmail");
+        String videoUrl = requestBody.get("videoUrl");
+        String newFilter = requestBody.get("filter");
+
+        if (memberEmail == null || videoUrl == null || newFilter == null) {
+            return ResponseEntity.badRequest().body("Missing memberEmail, videoUrl, or filter");
+        }
+
+        try {
+            videoService.updateVideoFilter(memberEmail, videoUrl, newFilter);
+            return ResponseEntity.ok("Filter updated successfully");
+        } catch (IllegalStateException e) {
             return ResponseEntity.notFound().build();
         }
     }
@@ -104,5 +129,20 @@ public class VideoController {
     public ResponseEntity<Boolean> checkVideoDuplicate(@RequestBody VideoDto videoDto) {
         boolean exists = videoService.videoExists(videoDto.getMemberEmail(), videoDto.getVideoUrl());
         return ResponseEntity.ok(exists);
+    }
+    //필터별 영상정보 불러오기
+    @PostMapping("/filter-videos")
+    @CrossOrigin("*")
+    public ResponseEntity<List<VideoDto>> getVideosByFilter(@RequestBody Map<String, String> body) {
+        String filter = body.get("filter");
+        if (filter == null || filter.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        List<VideoDto> videos = videoService.findVideosByFilter(filter);
+        if (!videos.isEmpty()) {
+            return ResponseEntity.ok(videos);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

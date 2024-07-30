@@ -53,4 +53,12 @@ public class VideoEntity {
 
     @Column(name = "document_date")
     private LocalDate documentDate;
+
+    /* 비디오 게시 여부 */
+    @Column(name = "is_published")
+    private Boolean isPublished = false; // 기본값 false
+
+    @Column(name = "view_count")
+    private Long viewCount = 0L; // 조회수 필드, 기본값 0
+
 }

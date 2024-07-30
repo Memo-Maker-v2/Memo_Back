@@ -1,4 +1,4 @@
-package com.example.memo.dto;
+package com.example.memo.dto.user;
 
 import com.example.memo.entity.MemberEntity;
 import jakarta.validation.constraints.NotBlank;

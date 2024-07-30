@@ -1,10 +1,10 @@
 package com.example.memo.controller;
 
 
-import com.example.memo.dto.MemberDto;
-import com.example.memo.dto.SignInRequestDto;
-import com.example.memo.dto.SignInResponseDto;
-import com.example.memo.dto.SignUpResponseDto;
+import com.example.memo.dto.user.MemberDto;
+import com.example.memo.dto.user.SignInRequestDto;
+import com.example.memo.dto.user.SignInResponseDto;
+import com.example.memo.dto.user.SignUpResponseDto;
 import com.example.memo.entity.MemberEntity;
 import com.example.memo.repository.MemberRepository;
 import com.example.memo.service.AuthService;
@@ -18,10 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;

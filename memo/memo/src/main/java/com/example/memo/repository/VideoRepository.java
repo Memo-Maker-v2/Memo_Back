@@ -3,6 +3,7 @@ package com.example.memo.repository;
 import com.example.memo.entity.VideoEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -22,4 +23,10 @@ public interface VideoRepository extends JpaRepository<VideoEntity, Long> {
     List<VideoEntity> findByMemberEmail(String memberEmail);
     //category삭제
     List<VideoEntity> findByMemberEmailAndCategoryName(String memberEmail, String categoryName);
+    //필터별 영상 조회
+    List<VideoEntity> findByFilter(String filter);
+    //조회수 업데이트
+    @Modifying
+    @Query("UPDATE VideoEntity v SET v.viewCount = v.viewCount + 1 WHERE v.videoId = :videoId")
+    void incrementViewCount(long videoId);
 }

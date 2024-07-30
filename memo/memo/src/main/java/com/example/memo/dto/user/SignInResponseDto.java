@@ -1,12 +1,11 @@
-package com.example.memo.dto;
+package com.example.memo.dto.user;
 
 import com.example.memo.common.ResponseCode;
 import com.example.memo.common.ResponseMessage;
+import com.example.memo.dto.ResponseDto;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import java.util.List;
 
 @Getter
 public class SignInResponseDto extends ResponseDto {
