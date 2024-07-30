@@ -2,6 +2,8 @@ package com.example.memo.service;
 
 import com.example.memo.common.OpenAIUtils;
 import com.example.memo.dto.YoutubeResponseDto;
+import com.example.memo.entity.VideoEntity;
+import com.example.memo.repository.YoutubeVideoRepository;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -34,9 +36,11 @@ public class YoutubeService {
   @Value("${youtube.api.key}")
   private String apiKey;
   
+  @Autowired
+  private YoutubeVideoRepository youtubeVideoRepository;
+  
   private final OkHttpClient httpClient = new OkHttpClient();
   
-  // 유튜브 URL을 열고 자막을 추출한 뒤 요약본을 생성하고 DTO로 반환하는 메소드
   public YoutubeResponseDto processYoutubeUrl(String url, String memberEmail) throws IOException, JSONException {
     if (url.contains("youtube.com/shorts/")) {
       url = url.replace("youtube.com/shorts/", "youtube.com/watch?v=");
@@ -50,28 +54,33 @@ public class YoutubeService {
     String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     
     try {
-      // 비디오 제목과 썸네일 URL 가져오기
       videoTitle = getVideoTitle(url);
       thumbnailUrl = getThumbnailUrl(url);
       
-      // URL 열기
       driver.get(url);
       driver.manage().window().setSize(new Dimension(1920, 1080));
       waitForPageLoad(driver);
       
-      // "더보기" 버튼 클릭
       clickMoreButton(driver);
       sleepWithExceptionHandling(2000);
       
-      // "스크립트 표시" 버튼 클릭
       clickScriptButton(driver);
       
-      // 자막 추출
       fullScript = extractTranscript(driver);
       String subtitleLanguage = extractSubtitleLanguage(driver);
       
-      // 자막을 GPT-3.5-turbo를 통해 요약본 생성
       summary = generateSummary(fullScript, subtitleLanguage);
+      
+      VideoEntity videoEntity = new VideoEntity();
+      videoEntity.setSummary(summary);
+      videoEntity.setFullScript(fullScript);
+      videoEntity.setVideoUrl(url);
+      videoEntity.setThumbnailUrl(thumbnailUrl);
+      videoEntity.setVideoTitle(videoTitle);
+      videoEntity.setMemberEmail(memberEmail);
+      videoEntity.setDocumentDate(LocalDate.now());
+      
+      youtubeVideoRepository.save(videoEntity);
       
     } catch (Exception e) {
       System.err.println("An error occurred: " + e.getMessage());
@@ -82,7 +91,6 @@ public class YoutubeService {
     return new YoutubeResponseDto(videoTitle, fullScript, url, thumbnailUrl, summary, memberEmail, date);
   }
   
-  // WebDriver 초기화 메소드
   private WebDriver initializeWebDriver() throws IOException {
     Path tempDir = Files.createTempDirectory("selenium");
     InputStream chromedriverStream = getClass().getClassLoader().getResourceAsStream("drivers/chromedriver.exe");
@@ -98,19 +106,17 @@ public class YoutubeService {
     System.setProperty("webdriver.chrome.driver", tempFile.getAbsolutePath());
     
     ChromeOptions chromeOptions = new ChromeOptions();
-    chromeOptions.addArguments("--disable-gpu"); // GPU 가속 끄기
+    chromeOptions.addArguments("--disable-gpu");
     chromeOptions.addArguments("--no-sandbox");
-    chromeOptions.addArguments("--headless"); // headless 모드 활성화
+    chromeOptions.addArguments("--headless");
     
     return new ChromeDriver(chromeOptions);
   }
   
-  // 페이지 로딩 대기 메소드
   private void waitForPageLoad(WebDriver driver) {
     driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
   }
   
-  // "더보기" 버튼 클릭 메소드
   private void clickMoreButton(WebDriver driver) {
     try {
       WebElement moreButton = driver.findElement(By.cssSelector("tp-yt-paper-button#expand"));
@@ -121,15 +127,11 @@ public class YoutubeService {
     }
   }
   
-  // "스크립트 표시" 버튼 클릭 메소드
   private void clickScriptButton(WebDriver driver) {
     try {
       WebElement scriptButton = driver.findElement(By.cssSelector("button[aria-label='스크립트 표시']"));
       
-      // 요소가 화면에 보이도록 스크롤
       ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", scriptButton);
-      
-      // JavaScript Executor를 사용하여 클릭
       ((JavascriptExecutor) driver).executeScript("arguments[0].click();", scriptButton);
       
       System.out.println("Clicked '스크립트 표시' button");
@@ -138,7 +140,6 @@ public class YoutubeService {
     }
   }
   
-  // 자막 추출 메소드
   private String extractTranscript(WebDriver driver) {
     StringBuilder transcriptBuilder = new StringBuilder();
     try {
@@ -154,7 +155,7 @@ public class YoutubeService {
       }
       
       String fullScript = transcriptBuilder.toString();
-      System.out.println("Extracted FULL Transcript: \n" + fullScript); // 로그 추가
+      System.out.println("Extracted FULL Transcript: \n" + fullScript);
       return fullScript;
       
     } catch (Exception e) {
@@ -163,12 +164,11 @@ public class YoutubeService {
     return "";
   }
   
-  // 자막 언어 추출 메소드
   private String extractSubtitleLanguage(WebDriver driver) {
     try {
       WebElement languageElement = driver.findElement(By.cssSelector("div#label-text.style-scope.yt-dropdown-menu"));
       String languageText = languageElement.getText();
-      languageText = languageText.replace(" (자동 생성됨)", "");  // "자동 생성됨" 텍스트 제거
+      languageText = languageText.replace(" (자동 생성됨)", "");
       System.out.println("자막 언어: " + languageText);
       return languageText;
     } catch (Exception e) {
@@ -177,7 +177,6 @@ public class YoutubeService {
     }
   }
   
-  // 자막을 GPT-3.5-turbo API를 통해 요약본을 생성하는 메소드
   public String generateSummary(String transcript, String subtitleLanguage) {
     try {
       String summary = openAIUtils.summarizeTranscript(transcript, subtitleLanguage);
@@ -189,14 +188,12 @@ public class YoutubeService {
     }
   }
   
-  // 브라우저 종료 메소드
   private void closeBrowser(WebDriver driver) {
     if (driver != null) {
       driver.quit();
     }
   }
   
-  // 예외 처리를 포함한 대기 메소드
   private void sleepWithExceptionHandling(long millis) {
     try {
       Thread.sleep(millis);
@@ -205,7 +202,6 @@ public class YoutubeService {
     }
   }
   
-  // 유튜브 영상 제목 가져오기 메소드
   public String getVideoTitle(String videoUrl) throws IOException, JSONException {
     String videoId = extractVideoId(videoUrl);
     String apiUrl = "https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" + videoId + "&key=" + apiKey;
@@ -223,10 +219,8 @@ public class YoutubeService {
               .getJSONObject("snippet")
               .getString("title");
       
-      // 제목을 출력
       System.out.println("Video Title: " + title);
       
-      // 현재 날짜 출력
       LocalDate currentDate = LocalDate.now();
       DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
       String formattedDate = currentDate.format(formatter);
@@ -236,7 +230,6 @@ public class YoutubeService {
     }
   }
   
-  // 유튜브 썸네일 이미지 주소 가져오기 메소드
   public String getThumbnailUrl(String videoUrl) throws IOException, JSONException {
     String videoId = extractVideoId(videoUrl);
     String apiUrl = "https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" + videoId + "&key=" + apiKey;
@@ -253,17 +246,15 @@ public class YoutubeService {
               .getJSONObject(0)
               .getJSONObject("snippet")
               .getJSONObject("thumbnails")
-              .getJSONObject("high")  // 썸네일의 품질을 선택 ("default", "medium", "high")
+              .getJSONObject("high")
               .getString("url");
       
-      // 썸네일 URL을 출력
       System.out.println("Thumbnail URL: " + thumbnailUrl);
       
       return thumbnailUrl;
     }
   }
   
-  // 유튜브 URL에서 비디오 ID 추출
   private String extractVideoId(String videoUrl) {
     String[] parts = videoUrl.split("v=");
     if (parts.length > 1) {
