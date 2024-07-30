@@ -1,6 +1,6 @@
 package com.example.memo.service.implement;
 
-import com.example.memo.dto.GetSignInUserResponseDto;
+import com.example.memo.dto.user.GetSignInUserResponseDto;
 import com.example.memo.dto.ResponseDto;
 import com.example.memo.entity.MemberEntity;
 import com.example.memo.repository.MemberRepository;

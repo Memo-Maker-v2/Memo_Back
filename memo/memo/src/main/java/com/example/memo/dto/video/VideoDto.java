@@ -1,4 +1,4 @@
-package com.example.memo.dto;
+package com.example.memo.dto.video;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -37,6 +37,11 @@ public class VideoDto {
     private String memberEmail;
     //날짜
     private LocalDate documentDate;
+    //게시 여부
+    private Boolean isPublished;
+    //조회수
+    private Long viewCount;
+
 
     public VideoDto(String videoUrl, String thumbnailUrl, String videoTitle) {
         this.videoUrl=videoUrl;
@@ -49,12 +54,31 @@ public class VideoDto {
         this.videoTitle=videoTitle;
         this.categoryName=categoryName;
     }
-    public VideoDto(String videoTitle, String summary,  String videoUrl, String memberEmail, LocalDate documentDate, String categoryName) {
+    public VideoDto(String videoUrl, String thumbnailUrl, String videoTitle, String filter,LocalDate documentDate) {
+        this.videoUrl=videoUrl;
+        this.thumbnailUrl=thumbnailUrl;
+        this.videoTitle=videoTitle;
+        this.filter=filter;
+        this.documentDate=documentDate;
+    }
+    public VideoDto(String videoTitle, String summary,  String fullScript, String videoUrl, String memberEmail, LocalDate documentDate, String categoryName) {
         this.videoTitle=videoTitle;
         this.summary=summary;
+        this.fullScript=fullScript;
         this.videoUrl=videoUrl;
         this.memberEmail=memberEmail;
         this.documentDate=documentDate;
         this.categoryName=categoryName;
+    }
+
+    public VideoDto(String videoUrl, String thumbnailUrl, String videoTitle, String categoryName, String filter, LocalDate documentDate, Boolean isPublished, Long viewCount) {
+        this.videoUrl = videoUrl;
+        this.thumbnailUrl = thumbnailUrl;
+        this.videoTitle = videoTitle;
+        this.categoryName = categoryName;
+        this.filter = filter;
+        this.documentDate = documentDate;
+        this.isPublished = isPublished;
+        this.viewCount = viewCount;
     }
 }

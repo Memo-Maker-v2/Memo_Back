@@ -1,5 +1,6 @@
-package com.example.memo.dto;
+package com.example.memo.dto.video;
 
+import com.example.memo.dto.QuestionDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
