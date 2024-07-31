@@ -41,12 +41,26 @@ public class YoutubeService {
   
   private final OkHttpClient httpClient = new OkHttpClient();
   
+  // 최대 재시도 횟수와 재시도 간 대기 시간을 설정
+  private static final int MAX_RETRIES = 3;
+  private static final long RETRY_DELAY_MS =3000;
+  
+  /**
+   * 주어진 YouTube URL과 회원 이메일을 기반으로 유튜브 비디오 정보를 처리하는 메소드.
+   * 비디오 제목, 썸네일 URL, 전체 스크립트, 요약 등을 추출하고, 이를 데이터베이스에 저장합니다.
+   *
+   * @param url        유튜브 비디오 URL
+   * @param memberEmail 회원 이메일
+   * @return 유튜브 비디오 정보를 담은 DTO 객체
+   * @throws IOException, JSONException
+   */
   public YoutubeResponseDto processYoutubeUrl(String url, String memberEmail) throws IOException, JSONException {
+    // URL이 'shorts' 형식이면 'watch?v=' 형식으로 변환
     if (url.contains("youtube.com/shorts/")) {
       url = url.replace("youtube.com/shorts/", "youtube.com/watch?v=");
     }
     
-    WebDriver driver = initializeWebDriver();
+    WebDriver driver = initializeWebDriver(); // 웹 드라이버 초기화
     String videoTitle = "";
     String thumbnailUrl = "";
     String fullScript = "";
@@ -54,23 +68,24 @@ public class YoutubeService {
     String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     
     try {
-      videoTitle = getVideoTitle(url);
-      thumbnailUrl = getThumbnailUrl(url);
+      videoTitle = getVideoTitle(url); // 비디오 제목 가져오기
+      thumbnailUrl = getThumbnailUrl(url); // 썸네일 URL 가져오기
       
-      driver.get(url);
-      driver.manage().window().setSize(new Dimension(1920, 1080));
-      waitForPageLoad(driver);
+      driver.get(url); // 비디오 페이지 로드
+      driver.manage().window().setSize(new Dimension(1920, 1080)); // 브라우저 창 크기 설정
+      waitForPageLoad(driver); // 페이지 로드 대기
       
-      clickMoreButton(driver);
-      sleepWithExceptionHandling(2000);
+      clickMoreButton(driver); // '더보기' 버튼 클릭
+      sleepWithExceptionHandling(2000); // 2초 대기
       
-      clickScriptButton(driver);
+      clickScriptButton(driver); // '스크립트 표시' 버튼 클릭
       
-      fullScript = extractTranscript(driver);
-      String subtitleLanguage = extractSubtitleLanguage(driver);
+      fullScript = extractTranscript(driver); // 스크립트 추출
+      String subtitleLanguage = extractSubtitleLanguage(driver); // 자막 언어 추출
       
-      summary = generateSummary(fullScript, subtitleLanguage);
+      summary = generateSummaryWithRetries(fullScript, subtitleLanguage); // 요약 생성
       
+      // 비디오 정보를 데이터베이스에 저장
       VideoEntity videoEntity = new VideoEntity();
       videoEntity.setSummary(summary);
       videoEntity.setFullScript(fullScript);
@@ -85,12 +100,20 @@ public class YoutubeService {
     } catch (Exception e) {
       System.err.println("An error occurred: " + e.getMessage());
     } finally {
-      closeBrowser(driver);
+      closeBrowser(driver); // 브라우저 닫기
     }
     
+    // 유튜브 비디오 정보가 담긴 DTO 객체 반환
     return new YoutubeResponseDto(videoTitle, fullScript, url, thumbnailUrl, summary, memberEmail, date);
   }
   
+  /**
+   * Chrome 웹 드라이버를 초기화하는 메소드.
+   * 드라이버를 임시 디렉토리에 저장하고, ChromeDriver를 설정하여 반환합니다.
+   *
+   * @return 초기화된 WebDriver 객체
+   * @throws IOException
+   */
   private WebDriver initializeWebDriver() throws IOException {
     Path tempDir = Files.createTempDirectory("selenium");
     InputStream chromedriverStream = getClass().getClassLoader().getResourceAsStream("drivers/chromedriver.exe");
@@ -113,10 +136,20 @@ public class YoutubeService {
     return new ChromeDriver(chromeOptions);
   }
   
+  /**
+   * 페이지 로드가 완료될 때까지 대기하는 메소드.
+   *
+   * @param driver 웹 드라이버 객체
+   */
   private void waitForPageLoad(WebDriver driver) {
     driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
   }
   
+  /**
+   * '더보기' 버튼을 클릭하는 메소드.
+   *
+   * @param driver 웹 드라이버 객체
+   */
   private void clickMoreButton(WebDriver driver) {
     try {
       WebElement moreButton = driver.findElement(By.cssSelector("tp-yt-paper-button#expand"));
@@ -127,6 +160,11 @@ public class YoutubeService {
     }
   }
   
+  /**
+   * '스크립트 표시' 버튼을 클릭하는 메소드.
+   *
+   * @param driver 웹 드라이버 객체
+   */
   private void clickScriptButton(WebDriver driver) {
     try {
       WebElement scriptButton = driver.findElement(By.cssSelector("button[aria-label='스크립트 표시']"));
@@ -140,6 +178,12 @@ public class YoutubeService {
     }
   }
   
+  /**
+   * 웹 페이지에서 스크립트를 추출하는 메소드.
+   *
+   * @param driver 웹 드라이버 객체
+   * @return 추출한 스크립트 문자열
+   */
   private String extractTranscript(WebDriver driver) {
     StringBuilder transcriptBuilder = new StringBuilder();
     try {
@@ -164,6 +208,12 @@ public class YoutubeService {
     return "";
   }
   
+  /**
+   * 웹 페이지에서 자막 언어를 추출하는 메소드.
+   *
+   * @param driver 웹 드라이버 객체
+   * @return 자막 언어 문자열
+   */
   private String extractSubtitleLanguage(WebDriver driver) {
     try {
       WebElement languageElement = driver.findElement(By.cssSelector("div#label-text.style-scope.yt-dropdown-menu"));
@@ -177,23 +227,52 @@ public class YoutubeService {
     }
   }
   
-  public String generateSummary(String transcript, String subtitleLanguage) {
-    try {
-      String summary = openAIUtils.summarizeTranscript(transcript, subtitleLanguage);
-      System.out.println("Generated Summary in " + subtitleLanguage + ": \n" + summary);
-      return summary;
-    } catch (IOException e) {
-      System.err.println("Failed to generate summary: " + e.getMessage());
-      return "Summary generation failed.";
+  /**
+   * 스크립트와 자막 언어를 기반으로 요약을 생성하는 메소드.
+   * 요약 생성 요청이 타임아웃되거나 실패하면 최대 재시도 횟수만큼 다시 시도합니다.
+   *
+   * @param transcript      비디오 스크립트
+   * @param subtitleLanguage 자막 언어
+   * @return 생성된 요약 문자열
+   */
+  public String generateSummaryWithRetries(String transcript, String subtitleLanguage) {
+    int attempt = 0;
+    while (attempt < MAX_RETRIES) {
+      try {
+        String summary = openAIUtils.summarizeTranscript(transcript, subtitleLanguage);
+        System.out.println("Generated Summary in " + subtitleLanguage + ": \n" + summary);
+        return summary;
+      } catch (IOException e) {
+        attempt++;
+        System.err.println("Failed to generate summary: " + e.getMessage());
+        if (attempt < MAX_RETRIES) {
+          try {
+            Thread.sleep(RETRY_DELAY_MS); // 재시도 전 대기
+          } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+          }
+        }
+      }
     }
+    return "Summary generation failed.";
   }
   
+  /**
+   * 브라우저를 닫는 메소드.
+   *
+   * @param driver 웹 드라이버 객체
+   */
   private void closeBrowser(WebDriver driver) {
     if (driver != null) {
       driver.quit();
     }
   }
   
+  /**
+   * 주어진 밀리초만큼 대기하는 메소드.
+   *
+   * @param millis 대기 시간 (밀리초)
+   */
   private void sleepWithExceptionHandling(long millis) {
     try {
       Thread.sleep(millis);
@@ -202,6 +281,13 @@ public class YoutubeService {
     }
   }
   
+  /**
+   * 비디오 URL에서 비디오 ID를 추출하는 메소드.
+   *
+   * @param videoUrl 유튜브 비디오 URL
+   * @return 추출한 비디오 ID
+   * @throws IllegalArgumentException 비디오 URL이 유효하지 않은 경우
+   */
   public String getVideoTitle(String videoUrl) throws IOException, JSONException {
     String videoId = extractVideoId(videoUrl);
     String apiUrl = "https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" + videoId + "&key=" + apiKey;
@@ -230,6 +316,13 @@ public class YoutubeService {
     }
   }
   
+  /**
+   * 비디오 URL에서 썸네일 URL을 추출하는 메소드.
+   *
+   * @param videoUrl 유튜브 비디오 URL
+   * @return 추출한 썸네일 URL
+   * @throws IOException, JSONException
+   */
   public String getThumbnailUrl(String videoUrl) throws IOException, JSONException {
     String videoId = extractVideoId(videoUrl);
     String apiUrl = "https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" + videoId + "&key=" + apiKey;
@@ -255,6 +348,13 @@ public class YoutubeService {
     }
   }
   
+  /**
+   * 유튜브 비디오 URL에서 비디오 ID를 추출하는 메소드.
+   *
+   * @param videoUrl 유튜브 비디오 URL
+   * @return 비디오 ID
+   * @throws IllegalArgumentException 비디오 URL이 유효하지 않은 경우
+   */
   private String extractVideoId(String videoUrl) {
     String[] parts = videoUrl.split("v=");
     if (parts.length > 1) {
