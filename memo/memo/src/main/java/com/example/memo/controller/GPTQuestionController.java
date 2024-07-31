@@ -23,9 +23,9 @@ public class GPTQuestionController {
     }
     
     // 로그 찍기
-    System.out.println("askGPTQuestion Request Recived: " + gptQuestionDto.getMemberEmail() + "User");
+    System.out.println("askGPTQuestion Request Received: " + gptQuestionDto.getMemberEmail());
     
     // GPT에게 질문을 보내고 답변을 받음
-    return gptQuestionService.askQuestion(gptQuestionDto.getQuestion());
+    return gptQuestionService.askQuestion(gptQuestionDto);
   }
 }
