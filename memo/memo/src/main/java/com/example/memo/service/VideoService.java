@@ -120,7 +120,19 @@ public class VideoService {
                 .map(video -> new VideoDto(video.getVideoUrl(), video.getThumbnailUrl(), video.getVideoTitle(), video.getCategoryName()))
                 .collect(Collectors.toList());
     }
-    
+    // 비디오의 isPublished 값을 업데이트하는 메서드
+    public void updateVideoPublicationStatus(String memberEmail, String videoUrl, boolean isPublished) throws IllegalStateException {
+        VideoEntity videoEntity = videoRepository.findByMemberEmailAndVideoUrl(memberEmail, videoUrl);
+        videoEntity.setIsPublished(isPublished);
+        videoRepository.save(videoEntity);
+    }
+    // 필터와 isPublished가 true인 비디오 정보를 가져오는 메서드
+    public List<VideoDto> findPublishedVideosByFilter(String filter) {
+        List<VideoEntity> videoEntities = videoRepository.findByFilterAndIsPublishedTrue(filter);
+        return videoEntities.stream()
+                .map(VideoDto::new) // VideoEntity를 VideoDto로 변환
+                .collect(Collectors.toList());
+    }
     //카테고리에 영상 추가
     @Transactional
     public void addVideoToFolder(String memberEmail, String videoUrl, String categoryName) {
@@ -135,7 +147,6 @@ public class VideoService {
         video.setCategoryName(categoryName);
         videoRepository.save(video);
     }
-
     // video_table의 카테고리 이름 업데이트
     @Transactional
     public void updateCategoryNameForMember(String memberEmail, String oldCategoryName, String newCategoryName) {
@@ -145,7 +156,6 @@ public class VideoService {
             videoRepository.save(video);
         }
     }
-
     //카테고리 삭제시 categoryName null로 해줌
     @Transactional
     public void removeCategoryFromVideos(String memberEmail, String categoryName) {
@@ -165,12 +175,5 @@ public class VideoService {
         } else {
             return false; // 비디오를 찾지 못한 경우
         }
-    }
-    @Transactional(readOnly = true)
-    public List<VideoDto> findVideosByFilter(String filter) {
-        List<VideoEntity> videos = videoRepository.findByFilter(filter);
-        return videos.stream()
-                .map(video -> new VideoDto(video.getVideoUrl(), video.getThumbnailUrl(), video.getVideoTitle(), video.getFilter(),video.getDocumentDate()))
-                .collect(Collectors.toList());
     }
 }

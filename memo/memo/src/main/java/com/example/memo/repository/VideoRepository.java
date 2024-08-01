@@ -29,4 +29,6 @@ public interface VideoRepository extends JpaRepository<VideoEntity, Long> {
     @Modifying
     @Query("UPDATE VideoEntity v SET v.viewCount = v.viewCount + 1 WHERE v.videoId = :videoId")
     void incrementViewCount(long videoId);
+    // 필터와 isPublished가 true인 비디오를 찾는 메서드
+    List<VideoEntity> findByFilterAndIsPublishedTrue(String filter);
 }
