@@ -1,5 +1,6 @@
 package com.example.memo.dto.video;
 
+import com.example.memo.entity.VideoEntity;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -80,5 +81,20 @@ public class VideoDto {
         this.documentDate = documentDate;
         this.isPublished = isPublished;
         this.viewCount = viewCount;
+    }
+    // VideoEntity를 받아서 VideoDto로 변환하는 생성자
+    public VideoDto(VideoEntity videoEntity) {
+        this.videoId = videoEntity.getVideoId();
+        this.summary = videoEntity.getSummary();
+        this.fullScript = videoEntity.getFullScript();
+        this.videoUrl = videoEntity.getVideoUrl();
+        this.thumbnailUrl = videoEntity.getThumbnailUrl();
+        this.videoTitle = videoEntity.getVideoTitle();
+        this.categoryName = videoEntity.getCategoryName();
+        this.filter = videoEntity.getFilter();
+        this.memberEmail = videoEntity.getMemberEmail();
+        this.documentDate = videoEntity.getDocumentDate();
+        this.isPublished = videoEntity.getIsPublished();
+        this.viewCount = videoEntity.getViewCount();
     }
 }
