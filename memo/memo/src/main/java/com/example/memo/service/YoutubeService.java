@@ -4,9 +4,7 @@ import com.example.memo.common.OpenAIUtils;
 import com.example.memo.dto.YoutubeResponseDto;
 import com.example.memo.entity.VideoEntity;
 import com.example.memo.repository.YoutubeVideoRepository;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.*;
@@ -45,6 +43,45 @@ public class YoutubeService {
   private static final int MAX_RETRIES = 3;
   private static final long RETRY_DELAY_MS =3000;
   
+  private static final String CHECK_DUPLICATE_URL = "http://localhost:8080/api/v1/video/check-duplicate"; // CHECK_DUPLICATE API 주소
+  
+  /**
+   * 비디오 URL과 이메일을 기반으로 중복 여부를 확인하는 메소드.
+   *
+   * @param url 유튜브 비디오 URL
+   * @param memberEmail 회원 이메일
+   * @return 비디오 중복 여부 (true: 중복, false: 비중복)
+   * @throws IOException
+   */
+  private boolean isVideoDuplicate(String url, String memberEmail) throws IOException {
+    String requestBody = String.format("{\"videoUrl\": \"%s\", \"memberEmail\": \"%s\"}", url, memberEmail);
+    RequestBody body = RequestBody.create(requestBody, MediaType.parse("application/json"));
+    
+    Request request = new Request.Builder()
+            .url(CHECK_DUPLICATE_URL)
+            .post(body)
+            .build();
+    
+    try (Response response = httpClient.newCall(request).execute()) {
+      if (!response.isSuccessful()) {
+        throw new IOException("Unexpected code " + response);
+      }
+      
+      // 서버 응답을 문자열로 가져오기
+      String responseBody = response.body().string();
+      System.out.println("Server response: " + responseBody); // 서버 응답 내용 확인
+      
+      // 응답이 "true" 또는 "false" 문자열인지 확인
+      if ("true".equalsIgnoreCase(responseBody.trim())) {
+        return true;
+      } else if ("false".equalsIgnoreCase(responseBody.trim())) {
+        return false;
+      } else {
+        throw new IOException("Unexpected response body: " + responseBody);
+      }
+    }
+  }
+  
   /**
    * 주어진 YouTube URL과 회원 이메일을 기반으로 유튜브 비디오 정보를 처리하는 메소드.
    * 비디오 제목, 썸네일 URL, 전체 스크립트, 요약 등을 추출하고, 이를 데이터베이스에 저장합니다.
@@ -60,6 +97,12 @@ public class YoutubeService {
       url = url.replace("youtube.com/shorts/", "youtube.com/watch?v=");
     }
     
+//    // 비디오 중복 여부 확인
+//    if (isVideoDuplicate(url, memberEmail)) {
+//      System.out.println("Video is already in the database.");
+//      return new YoutubeResponseDto("Video already exists", "", url, "", "", memberEmail, LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+//    }
+    
     WebDriver driver = initializeWebDriver(); // 웹 드라이버 초기화
     String videoTitle = "";
     String thumbnailUrl = "";
@@ -68,6 +111,23 @@ public class YoutubeService {
     String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     
     try {
+      // 중복 비디오 확인
+      if (isVideoDuplicate(url, memberEmail)) {
+        // 중복된 비디오 정보 가져오기
+        VideoEntity videoEntity = youtubeVideoRepository.findByMemberEmailAndVideoUrl(memberEmail, url);
+        if (videoEntity != null) {
+          return new YoutubeResponseDto(
+                  videoEntity.getVideoTitle(),
+                  videoEntity.getFullScript(),
+                  videoEntity.getVideoUrl(),
+                  videoEntity.getThumbnailUrl(),
+                  videoEntity.getSummary(),
+                  memberEmail,
+                  date
+          );
+        }
+      }
+      
       videoTitle = getVideoTitle(url); // 비디오 제목 가져오기
       thumbnailUrl = getThumbnailUrl(url); // 썸네일 URL 가져오기
       

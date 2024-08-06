@@ -15,7 +15,7 @@ public class YoutubeController {
   @Autowired
   private YoutubeService youtubeService;
   
-  @PostMapping("/get-full-script")
+  @PostMapping("/summary")
   @CrossOrigin("*")
   public ResponseEntity<?> getFullScript(@RequestBody YoutubeRequestDto requestDto) {
     try {
