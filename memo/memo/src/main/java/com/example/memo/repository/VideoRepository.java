@@ -38,4 +38,6 @@ public interface VideoRepository extends JpaRepository<VideoEntity, Long> {
     @Transactional
     @Query("UPDATE VideoEntity v SET v.viewCount = v.viewCount + 1 WHERE v.memberEmail = :memberEmail AND v.videoUrl = :videoUrl")
     void incrementViewCount(@Param("memberEmail") String memberEmail, @Param("videoUrl") String videoUrl);
+    List<VideoEntity> findByIsPublishedTrueOrderByDocumentDateDesc();
+
 }
