@@ -21,20 +21,20 @@ public class SavedVideoController {
         String memberEmail = request.get("memberEmail");
         return savedVideoService.getAllSavedVideos(memberEmail);
     }
-    @PostMapping("/get-video")
-    public Optional<VideoDto> getVideoById(@RequestBody VideoIdRequest videoIdRequest) {
-        return savedVideoService.getVideoById(videoIdRequest.getVideoId());
-    }
-
-    public static class VideoIdRequest {
-        private long videoId;
-
-        public long getVideoId() {
-            return videoId;
-        }
-
-        public void setVideoId(long videoId) {
-            this.videoId = videoId;
-        }
-    }
+//    @PostMapping("/get-video")
+//    public Optional<VideoDto> getVideoById(@RequestBody VideoIdRequest videoIdRequest) {
+//        return savedVideoService.getVideoById(videoIdRequest.getVideoId());
+//    }
+//
+//    public static class VideoIdRequest {
+//        private long videoId;
+//
+//        public long getVideoId() {
+//            return videoId;
+//        }
+//
+//        public void setVideoId(long videoId) {
+//            this.videoId = videoId;
+//        }
+//    }
 }
