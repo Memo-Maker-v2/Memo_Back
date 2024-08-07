@@ -227,4 +227,19 @@ public class VideoService {
                 ))
                 .collect(Collectors.toList());
     }
+    @Transactional(readOnly = true)
+    public List<VideoDto> findLatestPublishedVideos() {
+        List<VideoEntity> videoEntities = videoRepository.findByIsPublishedTrueOrderByDocumentDateDesc();
+        return videoEntities.stream()
+                .map(videoEntity -> new VideoDto(
+                        videoEntity.getVideoUrl(),
+                        videoEntity.getThumbnailUrl(),
+                        videoEntity.getVideoTitle(),
+                        videoEntity.getCategoryName(),
+                        videoEntity.getFilter(),
+                        videoEntity.getDocumentDate(),
+                        videoEntity.getIsPublished(),
+                        videoEntity.getViewCount()))
+                .collect(Collectors.toList());
+    }
 }

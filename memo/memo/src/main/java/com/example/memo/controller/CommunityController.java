@@ -42,11 +42,18 @@ public class CommunityController {
             return ResponseEntity.notFound().build();
         }
     }
-    //조회수순으로 정렬(인기순)
+    //조회수 순으로 정렬(인기순)
     @GetMapping("/popular")
     @CrossOrigin("*")
     public ResponseEntity<List<VideoDto>> getMostPopularVideos() {
         List<VideoDto> videos = videoService.findPublishedVideosByPopularity();
+        return ResponseEntity.ok(videos);
+    }
+    // 최신 순으로 정렬(최신순)
+    @GetMapping("/latest")
+    @CrossOrigin("*")
+    public ResponseEntity<List<VideoDto>> getLatestPublishedVideos() {
+        List<VideoDto> videos = videoService.findLatestPublishedVideos();
         return ResponseEntity.ok(videos);
     }
 }
