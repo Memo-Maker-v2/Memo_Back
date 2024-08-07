@@ -1,0 +1,52 @@
+package com.example.memo.controller;
+
+import com.example.memo.dto.video.VideoDto;
+import com.example.memo.service.VideoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/v1/community")
+public class CommunityController {
+    private final VideoService videoService;
+    @Autowired
+    public CommunityController(VideoService videoService) {
+        this.videoService = videoService;
+    }
+    //게시된 비디오만 불러오기
+    @GetMapping("/published-videos")
+    @CrossOrigin("*")
+    public ResponseEntity<List<VideoDto>> getPublishedVideos() {
+        List<VideoDto> videos = videoService.findPublishedVideos();
+        return ResponseEntity.ok(videos);
+    }
+    //게시물 클릭했을때 video 정보
+    @PostMapping("/video")
+    @CrossOrigin("*")
+    public ResponseEntity<VideoDto> getVideoInfo(@RequestBody Map<String, String> requestBody) {
+        String memberEmail = requestBody.get("memberEmail");
+        String videoUrl = requestBody.get("videoUrl");
+
+        if (memberEmail == null || memberEmail.isEmpty() || videoUrl == null || videoUrl.isEmpty()) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        VideoDto video = videoService.findVideoByEmailAndUrl(memberEmail, videoUrl);
+        if (video != null) {
+            return ResponseEntity.ok(video);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    //조회수순으로 정렬(인기순)
+    @GetMapping("/popular")
+    @CrossOrigin("*")
+    public ResponseEntity<List<VideoDto>> getMostPopularVideos() {
+        List<VideoDto> videos = videoService.findPublishedVideosByPopularity();
+        return ResponseEntity.ok(videos);
+    }
+}

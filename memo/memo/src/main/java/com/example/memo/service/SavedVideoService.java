@@ -54,14 +54,6 @@ public class SavedVideoService {
             return savedVideoDTO;
         }).collect(Collectors.toList());
     }
-    //비디오 조회하고 조회수를 증가시킴
-    @Transactional
-    public Optional<VideoDto> getVideoById(long videoId) {
-        videoRepository.incrementViewCount(videoId); // 조회수 증가
-
-        Optional<VideoEntity> videoEntity = videoRepository.findById(videoId);
-        return videoEntity.map(this::convertToDto);
-    }
 
     private VideoDto convertToDto(VideoEntity videoEntity) {
         return new VideoDto(

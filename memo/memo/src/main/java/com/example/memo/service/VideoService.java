@@ -176,4 +176,55 @@ public class VideoService {
             return false; // 비디오를 찾지 못한 경우
         }
     }
+    @Transactional
+    public List<VideoDto> findPublishedVideos() {
+        List<VideoEntity> videoEntities = videoRepository.findByIsPublishedTrue();
+        return videoEntities.stream()
+                .map(videoEntity -> new VideoDto(
+                        videoEntity.getVideoUrl(),
+                        videoEntity.getThumbnailUrl(),
+                        videoEntity.getVideoTitle(),
+                        videoEntity.getCategoryName(),
+                        videoEntity.getFilter(),
+                        videoEntity.getDocumentDate(),
+                        videoEntity.getIsPublished(),
+                        videoEntity.getViewCount()))
+                .collect(Collectors.toList());
+    }
+    // memberEmail과 videoUrl을 사용하여 VideoDto를 가져오는 메서드
+    @Transactional
+    public VideoDto findVideoByEmailAndUrl(String memberEmail, String videoUrl) {
+        VideoEntity videoEntity = videoRepository.findByMemberEmailAndVideoUrl(memberEmail, videoUrl);
+        if (videoEntity != null) {
+            videoRepository.incrementViewCount(memberEmail, videoUrl);
+            return new VideoDto(
+                    videoEntity.getVideoUrl(),
+                    videoEntity.getThumbnailUrl(),
+                    videoEntity.getVideoTitle(),
+                    videoEntity.getCategoryName(),
+                    videoEntity.getFilter(),
+                    videoEntity.getDocumentDate(),
+                    videoEntity.getIsPublished(),
+                    videoEntity.getViewCount()
+            );
+        }
+        return null;
+    }
+    // isPublished가 true인 비디오를 조회수 기준으로 정렬하여 가져오는 메서드
+    @Transactional(readOnly = true)
+    public List<VideoDto> findPublishedVideosByPopularity() {
+        List<VideoEntity> videoEntities = videoRepository.findByIsPublishedTrueOrderByViewCountDesc();
+        return videoEntities.stream()
+                .map(videoEntity -> new VideoDto(
+                        videoEntity.getVideoUrl(),
+                        videoEntity.getThumbnailUrl(),
+                        videoEntity.getVideoTitle(),
+                        videoEntity.getCategoryName(),
+                        videoEntity.getFilter(),
+                        videoEntity.getDocumentDate(),
+                        videoEntity.getIsPublished(),
+                        videoEntity.getViewCount()
+                ))
+                .collect(Collectors.toList());
+    }
 }
