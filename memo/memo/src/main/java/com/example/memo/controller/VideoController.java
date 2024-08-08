@@ -114,21 +114,7 @@ public class VideoController {
             return ResponseEntity.ok("Video not found");
         }
     }
-    // 필터별로 isPublished가 true인 비디오 정보를 가져옴
-    @PostMapping("/filter-videos")
-    @CrossOrigin("*")
-    public ResponseEntity<List<VideoDto>> getVideosByFilter(@RequestBody Map<String, String> body) {
-        String filter = body.get("filter");
-        if (filter == null || filter.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-        List<VideoDto> videos = videoService.findPublishedVideosByFilter(filter);
-        if (!videos.isEmpty()) {
-            return ResponseEntity.ok(videos);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
+
     // 멤버 이메일에 따른 비디오 목록 조회
     @PostMapping("/category-video")
     @CrossOrigin("*")
