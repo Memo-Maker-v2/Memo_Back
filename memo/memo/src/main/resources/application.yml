@@ -34,3 +34,9 @@ spring:
 
 
 secret-key: ThisStatementIsJwtSecretKeyDoNotUseThisStatement;
+youtube:
+  api:
+    key: "AIzaSyBwTC375RADOCR3CNB5mtuaObkLyO9rPyY"
+openai:
+  api:
+    key: "sk-None-3z2650cZGFBg7nVx79irT3BlbkFJSfz3zH3VBj39Zq6CNpY8"
