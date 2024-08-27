@@ -242,4 +242,43 @@ public class VideoService {
                         videoEntity.getViewCount()))
                 .collect(Collectors.toList());
     }
+    // 제목으로 비디오를 검색하는 메서드
+    @Transactional(readOnly = true)
+    public List<VideoDto> findVideosByTitle(String title) {
+        List<VideoEntity> videoEntities = videoRepository.findByVideoTitleContainingAndIsPublishedTrue(title);
+        return videoEntities.stream()
+                .map(videoEntity -> new VideoDto(
+                        videoEntity.getVideoUrl(),
+                        videoEntity.getThumbnailUrl(),
+                        videoEntity.getVideoTitle(),
+                        videoEntity.getCategoryName(),
+                        videoEntity.getFilter(),
+                        videoEntity.getDocumentDate(),
+                        videoEntity.getIsPublished(),
+                        videoEntity.getViewCount()))
+                .collect(Collectors.toList());
+    }
+    // 비디오의 summary 정보를 업데이트하는 메서드
+    @Transactional
+    public void updateVideoSummary(String memberEmail, String videoUrl, String newSummary) {
+        VideoEntity videoEntity = videoRepository.findByMemberEmailAndVideoUrl(memberEmail, videoUrl);
+        if (videoEntity == null) {
+            throw new IllegalStateException("Video not found for the provided email and URL");
+        }
+
+        videoEntity.setSummary(newSummary);
+        videoRepository.save(videoEntity);
+    }
+    // 비디오의 fullScript 정보를 업데이트하는 메서드
+    @Transactional
+    public void updateVideoFullScript(String memberEmail, String videoUrl, String newFullScript) {
+        VideoEntity videoEntity = videoRepository.findByMemberEmailAndVideoUrl(memberEmail, videoUrl);
+        if (videoEntity == null) {
+            throw new IllegalStateException("Video not found for the provided email and URL");
+        }
+
+        videoEntity.setFullScript(newFullScript);
+        videoRepository.save(videoEntity);
+    }
+
 }
