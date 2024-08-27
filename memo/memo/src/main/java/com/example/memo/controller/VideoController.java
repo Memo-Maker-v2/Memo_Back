@@ -114,7 +114,6 @@ public class VideoController {
             return ResponseEntity.ok("Video not found");
         }
     }
-
     // 멤버 이메일에 따른 비디오 목록 조회
     @PostMapping("/category-video")
     @CrossOrigin("*")
@@ -140,6 +139,44 @@ public class VideoController {
             }
         } catch (Exception e) {
             return ResponseEntity.ok(false);
+        }
+    }
+    // 비디오의 summary 정보를 업데이트
+    @PutMapping("/update-summary")
+    @CrossOrigin("*")
+    public ResponseEntity<String> updateVideoSummary(@RequestBody Map<String, String> requestBody) {
+        String memberEmail = requestBody.get("memberEmail");
+        String videoUrl = requestBody.get("videoUrl");
+        String newSummary = requestBody.get("summary");
+
+        if (memberEmail == null || videoUrl == null || newSummary == null) {
+            return ResponseEntity.badRequest().body("Missing memberEmail, videoUrl, or summary");
+        }
+
+        try {
+            videoService.updateVideoSummary(memberEmail, videoUrl, newSummary);
+            return ResponseEntity.ok("Summary updated successfully");
+        } catch (IllegalStateException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    // 비디오의 fullScript 정보를 업데이트
+    @PutMapping("/update-fullscript")
+    @CrossOrigin("*")
+    public ResponseEntity<String> updateVideoFullScript(@RequestBody Map<String, String> requestBody) {
+        String memberEmail = requestBody.get("memberEmail");
+        String videoUrl = requestBody.get("videoUrl");
+        String newFullScript = requestBody.get("fullScript");
+
+        if (memberEmail == null || videoUrl == null || newFullScript == null) {
+            return ResponseEntity.badRequest().body("Missing memberEmail, videoUrl, or fullScript");
+        }
+
+        try {
+            videoService.updateVideoFullScript(memberEmail, videoUrl, newFullScript);
+            return ResponseEntity.ok("Full script updated successfully");
+        } catch (IllegalStateException e) {
+            return ResponseEntity.notFound().build();
         }
     }
     //video삭제

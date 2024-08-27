@@ -1,5 +1,6 @@
 package com.example.memo.repository;
 
+import com.example.memo.dto.video.VideoDto;
 import com.example.memo.entity.VideoEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -39,5 +40,6 @@ public interface VideoRepository extends JpaRepository<VideoEntity, Long> {
     @Query("UPDATE VideoEntity v SET v.viewCount = v.viewCount + 1 WHERE v.memberEmail = :memberEmail AND v.videoUrl = :videoUrl")
     void incrementViewCount(@Param("memberEmail") String memberEmail, @Param("videoUrl") String videoUrl);
     List<VideoEntity> findByIsPublishedTrueOrderByDocumentDateDesc();
-
+    // 제목으로 검색하고 게시된 비디오만 반환
+    List<VideoEntity> findByVideoTitleContainingAndIsPublishedTrue(String title);
 }

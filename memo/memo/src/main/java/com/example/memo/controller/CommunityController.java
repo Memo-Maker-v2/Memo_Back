@@ -71,4 +71,19 @@ public class CommunityController {
             return ResponseEntity.notFound().build();
         }
     }
+    // 제목으로 비디오 검색
+    @PostMapping("/search-videos")
+    @CrossOrigin("*")
+    public ResponseEntity<List<VideoDto>> searchVideosByTitle(@RequestBody Map<String, String> body) {
+        String videoTitle = body.get("videoTitle");
+        if (videoTitle == null || videoTitle.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        List<VideoDto> videos = videoService.findVideosByTitle(videoTitle);
+        if (!videos.isEmpty()) {
+            return ResponseEntity.ok(videos);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
