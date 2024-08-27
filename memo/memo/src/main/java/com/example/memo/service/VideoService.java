@@ -1,8 +1,8 @@
 package com.example.memo.service;
 
 import com.example.memo.dto.QuestionDto;
-import com.example.memo.dto.VideoAndQuestionDto;
-import com.example.memo.dto.VideoDto;
+import com.example.memo.dto.video.VideoAndQuestionDto;
+import com.example.memo.dto.video.VideoDto;
 import com.example.memo.entity.MemberEntity;
 import com.example.memo.entity.QuestionEntity;
 import com.example.memo.entity.VideoEntity;
@@ -14,7 +14,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,15 +50,15 @@ public class VideoService {
         }
         VideoEntity videoEntity = new VideoEntity();
         videoEntity.setSummary(videoDto.getSummary());
+        videoEntity.setFullScript(videoDto.getFullScript());
         videoEntity.setVideoUrl(videoDto.getVideoUrl());
         videoEntity.setThumbnailUrl(videoDto.getThumbnailUrl());
         videoEntity.setVideoTitle(videoDto.getVideoTitle());
+        videoEntity.setFilter(videoDto.getFilter());
         videoEntity.setMemberEmail(videoDto.getMemberEmail());
         videoEntity.setDocumentDate(videoDto.getDocumentDate());
         return videoRepository.save(videoEntity);
     }
-
-
     //가장 많이 검색된 video 3개
     @Transactional(readOnly = true)
     public List<VideoDto> findMostFrequentVideos() {
@@ -69,14 +68,14 @@ public class VideoService {
                 .map(result -> new VideoDto((String) result[0], (String) result[1], (String) result[2]))
                 .collect(Collectors.toList());
     }
-    //video 삭제
-    @Transactional
-    public boolean deleteVideo(long videoId) {
-        if (videoRepository.existsById(videoId)) {
-            videoRepository.deleteById(videoId);
-            return true;
+    // videoUrl과 memberEmail을 사용하여 FullScript 데이터를 가져오는 메서드
+    @Transactional(readOnly = true)
+    public String getFullScriptByMemberEmailAndVideoUrl(String memberEmail, String videoUrl) {
+        VideoEntity videoEntity = videoRepository.findByMemberEmailAndVideoUrl(memberEmail, videoUrl);
+        if (videoEntity != null) {
+            return videoEntity.getFullScript();
         } else {
-            return false;
+            throw new IllegalStateException("Video not found for the provided email and URL");
         }
     }
     //video와 question 정보 가져옴
@@ -92,8 +91,19 @@ public class VideoService {
                 .map(q -> new QuestionDto(q.getQuestion(), q.getAnswer(),q.getMemberEmail(),q.getVideoUrl()))
                 .collect(Collectors.toList());
 
-        VideoDto videoDto = new VideoDto(video.getVideoTitle(),video.getSummary(), video.getVideoUrl(),video.getMemberEmail(), video.getDocumentDate(), video.getCategoryName());
+        VideoDto videoDto = new VideoDto(video.getVideoTitle(),video.getSummary(),video.getFullScript(), video.getVideoUrl(),video.getMemberEmail(), video.getDocumentDate(), video.getCategoryName());
         return new VideoAndQuestionDto(videoDto, questionDtos);
+    }
+    // 비디오의 filter 정보를 업데이트하는 메서드
+    @Transactional
+    public void updateVideoFilter(String memberEmail, String videoUrl, String newFilter) {
+        VideoEntity videoEntity = videoRepository.findByMemberEmailAndVideoUrl(memberEmail, videoUrl);
+        if (videoEntity == null) {
+            throw new IllegalStateException("Video not found for the provided email and URL");
+        }
+
+        videoEntity.setFilter(newFilter);
+        videoRepository.save(videoEntity);
     }
     //categoryName과 memberEmail로 영상 조회
     @Transactional(readOnly = true)
@@ -110,7 +120,19 @@ public class VideoService {
                 .map(video -> new VideoDto(video.getVideoUrl(), video.getThumbnailUrl(), video.getVideoTitle(), video.getCategoryName()))
                 .collect(Collectors.toList());
     }
-    
+    // 비디오의 isPublished 값을 업데이트하는 메서드
+    public void updateVideoPublicationStatus(String memberEmail, String videoUrl, boolean isPublished) throws IllegalStateException {
+        VideoEntity videoEntity = videoRepository.findByMemberEmailAndVideoUrl(memberEmail, videoUrl);
+        videoEntity.setIsPublished(isPublished);
+        videoRepository.save(videoEntity);
+    }
+    // 필터와 isPublished가 true인 비디오 정보를 가져오는 메서드
+    public List<VideoDto> findPublishedVideosByFilter(String filter) {
+        List<VideoEntity> videoEntities = videoRepository.findByFilterAndIsPublishedTrue(filter);
+        return videoEntities.stream()
+                .map(VideoDto::new) // VideoEntity를 VideoDto로 변환
+                .collect(Collectors.toList());
+    }
     //카테고리에 영상 추가
     @Transactional
     public void addVideoToFolder(String memberEmail, String videoUrl, String categoryName) {
@@ -125,7 +147,6 @@ public class VideoService {
         video.setCategoryName(categoryName);
         videoRepository.save(video);
     }
-
     // video_table의 카테고리 이름 업데이트
     @Transactional
     public void updateCategoryNameForMember(String memberEmail, String oldCategoryName, String newCategoryName) {
@@ -135,7 +156,6 @@ public class VideoService {
             videoRepository.save(video);
         }
     }
-
     //카테고리 삭제시 categoryName null로 해줌
     @Transactional
     public void removeCategoryFromVideos(String memberEmail, String categoryName) {
@@ -156,4 +176,109 @@ public class VideoService {
             return false; // 비디오를 찾지 못한 경우
         }
     }
+    @Transactional
+    public List<VideoDto> findPublishedVideos() {
+        List<VideoEntity> videoEntities = videoRepository.findByIsPublishedTrue();
+        return videoEntities.stream()
+                .map(videoEntity -> new VideoDto(
+                        videoEntity.getVideoUrl(),
+                        videoEntity.getThumbnailUrl(),
+                        videoEntity.getVideoTitle(),
+                        videoEntity.getCategoryName(),
+                        videoEntity.getFilter(),
+                        videoEntity.getDocumentDate(),
+                        videoEntity.getIsPublished(),
+                        videoEntity.getViewCount()))
+                .collect(Collectors.toList());
+    }
+    // memberEmail과 videoUrl을 사용하여 VideoDto를 가져오는 메서드
+    @Transactional
+    public VideoDto findVideoByEmailAndUrl(String memberEmail, String videoUrl) {
+        VideoEntity videoEntity = videoRepository.findByMemberEmailAndVideoUrl(memberEmail, videoUrl);
+        if (videoEntity != null) {
+            videoRepository.incrementViewCount(memberEmail, videoUrl);
+            return new VideoDto(
+                    videoEntity.getVideoUrl(),
+                    videoEntity.getThumbnailUrl(),
+                    videoEntity.getVideoTitle(),
+                    videoEntity.getCategoryName(),
+                    videoEntity.getFilter(),
+                    videoEntity.getDocumentDate(),
+                    videoEntity.getIsPublished(),
+                    videoEntity.getViewCount()
+            );
+        }
+        return null;
+    }
+    // isPublished가 true인 비디오를 조회수 기준으로 정렬하여 가져오는 메서드
+    @Transactional(readOnly = true)
+    public List<VideoDto> findPublishedVideosByPopularity() {
+        List<VideoEntity> videoEntities = videoRepository.findByIsPublishedTrueOrderByViewCountDesc();
+        return videoEntities.stream()
+                .map(videoEntity -> new VideoDto(
+                        videoEntity.getVideoUrl(),
+                        videoEntity.getThumbnailUrl(),
+                        videoEntity.getVideoTitle(),
+                        videoEntity.getCategoryName(),
+                        videoEntity.getFilter(),
+                        videoEntity.getDocumentDate(),
+                        videoEntity.getIsPublished(),
+                        videoEntity.getViewCount()
+                ))
+                .collect(Collectors.toList());
+    }
+    @Transactional(readOnly = true)
+    public List<VideoDto> findLatestPublishedVideos() {
+        List<VideoEntity> videoEntities = videoRepository.findByIsPublishedTrueOrderByDocumentDateDesc();
+        return videoEntities.stream()
+                .map(videoEntity -> new VideoDto(
+                        videoEntity.getVideoUrl(),
+                        videoEntity.getThumbnailUrl(),
+                        videoEntity.getVideoTitle(),
+                        videoEntity.getCategoryName(),
+                        videoEntity.getFilter(),
+                        videoEntity.getDocumentDate(),
+                        videoEntity.getIsPublished(),
+                        videoEntity.getViewCount()))
+                .collect(Collectors.toList());
+    }
+    // 제목으로 비디오를 검색하는 메서드
+    @Transactional(readOnly = true)
+    public List<VideoDto> findVideosByTitle(String title) {
+        List<VideoEntity> videoEntities = videoRepository.findByVideoTitleContainingAndIsPublishedTrue(title);
+        return videoEntities.stream()
+                .map(videoEntity -> new VideoDto(
+                        videoEntity.getVideoUrl(),
+                        videoEntity.getThumbnailUrl(),
+                        videoEntity.getVideoTitle(),
+                        videoEntity.getCategoryName(),
+                        videoEntity.getFilter(),
+                        videoEntity.getDocumentDate(),
+                        videoEntity.getIsPublished(),
+                        videoEntity.getViewCount()))
+                .collect(Collectors.toList());
+    }
+    // 비디오의 summary 정보를 업데이트하는 메서드
+    @Transactional
+    public void updateVideoSummary(String memberEmail, String videoUrl, String newSummary) {
+        VideoEntity videoEntity = videoRepository.findByMemberEmailAndVideoUrl(memberEmail, videoUrl);
+        if (videoEntity == null) {
+            throw new IllegalStateException("Video not found for the provided email and URL");
+        }
+
+        videoEntity.setSummary(newSummary);
+        videoRepository.save(videoEntity);
+    }
+    // 비디오의 fullScript 정보를 업데이트하는 메서드
+    @Transactional
+    public void updateVideoFullScript(String memberEmail, String videoUrl, String newFullScript) {
+        VideoEntity videoEntity = videoRepository.findByMemberEmailAndVideoUrl(memberEmail, videoUrl);
+        if (videoEntity == null) {
+            throw new IllegalStateException("Video not found for the provided email and URL");
+        }
+
+        videoEntity.setFullScript(newFullScript);
+        videoRepository.save(videoEntity);
+    }
+
 }

@@ -1,19 +1,16 @@
-package com.example.memo.dto;
+package com.example.memo.dto.video;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDate;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @ToString
-public class VideoDocumentUpdateDto {
+public class VideoFolderRequestDto {
     private String memberEmail;
     private String videoUrl;
-    private String document;
-    private LocalDate documentDate;
+    private String categoryName;
 }

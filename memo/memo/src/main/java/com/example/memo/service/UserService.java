@@ -1,6 +1,6 @@
 package com.example.memo.service;
 
-import com.example.memo.dto.GetSignInUserResponseDto;
+import com.example.memo.dto.user.GetSignInUserResponseDto;
 import org.springframework.http.ResponseEntity;
 
 public interface UserService {

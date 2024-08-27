@@ -1,14 +1,15 @@
-package com.example.memo.dto;
+package com.example.memo.dto.user;
 
 import com.example.memo.common.ResponseCode;
 import com.example.memo.common.ResponseMessage;
+import com.example.memo.dto.ResponseDto;
 import com.example.memo.entity.MemberEntity;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @Getter
-public class GetSignInUserResponseDto extends ResponseDto{
+public class GetSignInUserResponseDto extends ResponseDto {
 
     private String memberEmail;
     private String memberName;

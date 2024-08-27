@@ -1,6 +1,6 @@
 package com.example.memo.entity;
 
-import com.example.memo.dto.MemberDto;
+import com.example.memo.dto.user.MemberDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

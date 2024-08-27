@@ -3,7 +3,7 @@ package com.example.memo.controller;
 import com.example.memo.dto.CategoryDto;
 import com.example.memo.dto.CategoryUpdateDto;
 import com.example.memo.dto.CategoryRequest;
-import com.example.memo.dto.VideoFolderRequestDto;
+import com.example.memo.dto.video.VideoFolderRequestDto;
 import com.example.memo.service.CategoryService;
 import com.example.memo.service.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,8 +1,8 @@
 package com.example.memo.controller;
 
 
-import com.example.memo.dto.GetSignInUserResponseDto;
-import com.example.memo.dto.MemberNameUpdateDto;
+import com.example.memo.dto.user.GetSignInUserResponseDto;
+import com.example.memo.dto.user.MemberNameUpdateDto;
 import com.example.memo.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -49,7 +49,7 @@ public class WebSecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeRequests(request -> request
-                        .requestMatchers("/", "/api/v1/auth/**","/oauth2/**","/api/v1/questions/**","api/v1/category/**","/api/v1/video/**","/api/v1/user/**", "/api/v1/home/**").permitAll()  //접근허용 페이지 수정필요
+                        .requestMatchers("/", "/api/v1/auth/**","/oauth2/**","/api/v1/questions/**","api/v1/category/**","/api/v1/video/**","/api/v1/user/**", "/api/v1/home/**","/api/v1/community/**").permitAll()  //접근허용 페이지 수정필요
                         .requestMatchers(HttpMethod.GET, "/api/v1/board/**", "/api/v1/user/*","/api/v1/auth/**").permitAll() //접근제한 페이지 수정필요
                         .anyRequest().authenticated()
                 )
