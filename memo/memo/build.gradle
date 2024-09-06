@@ -60,6 +60,10 @@ dependencies {
 
 	// Google Cloud Speech-to-Text API
 
+	// Apache PDFBox 의존성 추가
+	implementation 'org.apache.pdfbox:pdfbox:2.0.28' // 최신 안정화 버전으로 업데이트
+	implementation 'org.apache.pdfbox:pdfbox-tools:3.0.0'
+
 }
 
 tasks.named('test') {
