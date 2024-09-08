@@ -21,7 +21,7 @@ public class PDFService {
   @Autowired
   private OpenAIUtils openAIUtils;
   
-  public void processFile(MultipartFile file, String memberEmail, String language) throws IOException {
+  public String processFile(MultipartFile file, String memberEmail, String language) throws IOException {
     // 파일이 비어 있는지 확인
     if (file.isEmpty()) {
       throw new IOException("File is empty");
@@ -59,11 +59,14 @@ public class PDFService {
     System.out.println("text = " + text);
     
     // OpenAI를 사용하여 텍스트 요약
-    String summary = openAIUtils.summarizeTranscript(text, language);
+    String summary = openAIUtils.summarizePDF(text, language);
     
     // 요약 결과 출력
     System.out.println("Summary: ");
     System.out.println(summary);
+    
+    // 요약 결과 반환
+    return summary;
   }
   
   // PDF에서 텍스트를 추출하는 메소드

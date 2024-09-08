@@ -27,13 +27,13 @@ public class PDFController {
     }
     
     try {
-      // 파일과 이메일을 서비스로 전달
-      pdfService.processFile(file, memberEmail, language);
+      // 파일과 이메일을 서비스로 전달하여 요약 결과 받기
+      String summary = pdfService.processFile(file, memberEmail, language);
+      
+      // 요약 결과를 프론트엔드에 반환
+      return ResponseEntity.ok(summary);
     } catch (IOException e) {
       return ResponseEntity.status(500).body("Failed to process file: " + e.getMessage());
     }
-    
-    // 성공적으로 처리되었다고 응답
-    return ResponseEntity.ok("File received successfully: " + file.getOriginalFilename() + ", Member Email: " + memberEmail);
   }
 }

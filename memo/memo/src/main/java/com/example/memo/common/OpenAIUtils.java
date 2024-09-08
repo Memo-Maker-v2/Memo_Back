@@ -17,10 +17,9 @@ public class OpenAIUtils {
   
   private static final String API_URL = "https://api.openai.com/v1/chat/completions";
   private static final int MAX_TOKENS = 15000; // GPT-3.5-turbo의 최대 토큰 수를 고려하여 보수적으로 설정
-  private static final int MAX_SUMMARY_TOKENS = 2048; // 요약 요청 시 최대 토큰 수
   
   // 자막과 언어 정보를 받아 GPT-3.5-turbo를 통해 요약본을 생성하는 메소드
-  public String summarizeTranscript(String transcript, String language) throws IOException {
+  public String youtubeSummarize(String transcript, String language) throws IOException {
     OkHttpClient client = new OkHttpClient();
     MediaType mediaType = MediaType.parse("application/json");
     
@@ -48,7 +47,7 @@ public class OpenAIUtils {
       messagesArray.put(userMessage);
       
       json.put("messages", messagesArray);
-      json.put("max_tokens", MAX_SUMMARY_TOKENS);
+      json.put("max_tokens", MAX_TOKENS);
       
       RequestBody body = RequestBody.create(mediaType, json.toString());
       Request request = new Request.Builder()
@@ -91,7 +90,7 @@ public class OpenAIUtils {
     message.put("content", question);
     
     json.put("messages", new JSONArray().put(message));
-    json.put("max_tokens", 150);
+    json.put("max_tokens", 2048);
     
     RequestBody body = RequestBody.create(mediaType, json.toString());
     Request request = new Request.Builder()
@@ -110,6 +109,58 @@ public class OpenAIUtils {
       throw new IOException("OpenAI API request failed: " + responseBody);
     }
   }
+  
+  public String summarizePDF(String text, String language) throws IOException {
+    OkHttpClient client = new OkHttpClient();
+    MediaType mediaType = MediaType.parse("application/json");
+    
+    JSONObject json = new JSONObject();
+    json.put("model", "gpt-3.5-turbo");
+    
+    JSONArray messagesArray = new JSONArray();
+    
+    // 시스템 메시지: 요약에 필요한 정보를 제공하는 부분
+    JSONObject systemMessage = new JSONObject();
+    systemMessage.put("role", "system");
+    
+    // 프롬프트 생성: PDF 텍스트와 언어 정보를 포함하여 요약 요청
+    String prompt = "This text was extracted from a PDF document written in " + language + ". "
+            + "Please summarize the content of each page in " + language + ". Indicate the page number at the beginning of each summary, like 'Page 1:', 'Page 2:', and so on. "
+            + "Please ensure that the summaries are written in " + language + " and provide detailed and thorough explanations for each point.";
+    
+    
+    systemMessage.put("content", prompt);
+    
+    // 사용자 메시지: 실제 추출된 텍스트를 전달
+    JSONObject userMessage = new JSONObject();
+    userMessage.put("role", "user");
+    userMessage.put("content", text);
+    
+    messagesArray.put(systemMessage);
+    messagesArray.put(userMessage);
+    
+    json.put("messages", messagesArray);
+    json.put("max_tokens", 2048);
+    
+    RequestBody body = RequestBody.create(mediaType, json.toString());
+    Request request = new Request.Builder()
+            .url(API_URL)
+            .post(body)
+            .addHeader("Content-Type", "application/json")
+            .addHeader("Authorization", "Bearer " + apiKey)
+            .build();
+    
+    Response response = client.newCall(request).execute();
+    String responseBody = response.body().string();
+    
+    if (response.isSuccessful()) {
+      return parseResponse(responseBody);
+    } else {
+      throw new IOException("OpenAI API request failed: " + responseBody);
+    }
+  }
+  
+  
   
   // OpenAI API 응답 파싱 메소드
   private String parseResponse(String response) {
