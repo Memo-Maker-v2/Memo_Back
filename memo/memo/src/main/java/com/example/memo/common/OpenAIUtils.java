@@ -17,9 +17,10 @@ public class OpenAIUtils {
   
   private static final String API_URL = "https://api.openai.com/v1/chat/completions";
   private static final int MAX_TOKENS = 15000; // GPT-3.5-turbo의 최대 토큰 수를 고려하여 보수적으로 설정
+  private static final int MAX_SUMMARY_TOKENS = 2048; // 요약 요청 시 최대 토큰 수
   
   // 자막과 언어 정보를 받아 GPT-3.5-turbo를 통해 요약본을 생성하는 메소드
-  public String youtubeSummarize(String transcript, String language) throws IOException {
+  public String summarizeTranscript(String transcript, String language) throws IOException {
     OkHttpClient client = new OkHttpClient();
     MediaType mediaType = MediaType.parse("application/json");
     
@@ -47,7 +48,7 @@ public class OpenAIUtils {
       messagesArray.put(userMessage);
       
       json.put("messages", messagesArray);
-      json.put("max_tokens", MAX_TOKENS);
+      json.put("max_tokens", MAX_SUMMARY_TOKENS);
       
       RequestBody body = RequestBody.create(mediaType, json.toString());
       Request request = new Request.Builder()
@@ -110,7 +111,7 @@ public class OpenAIUtils {
     }
   }
   
-  public String summarizePDF(String text, String language) throws IOException {
+  public String summarizeText(String text, String language) throws IOException {
     OkHttpClient client = new OkHttpClient();
     MediaType mediaType = MediaType.parse("application/json");
     

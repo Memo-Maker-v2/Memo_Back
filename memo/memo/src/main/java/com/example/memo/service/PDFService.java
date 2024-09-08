@@ -59,7 +59,7 @@ public class PDFService {
     System.out.println("text = " + text);
     
     // OpenAI를 사용하여 텍스트 요약
-    String summary = openAIUtils.summarizePDF(text, language);
+    String summary = openAIUtils.summarizeText(text, language);
     
     // 요약 결과 출력
     System.out.println("Summary: ");

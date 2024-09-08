@@ -1,12 +1,12 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://awsmemodb.cz4coeuywybx.ap-northeast-2.rds.amazonaws.com:3306/memo?&serverTimezone=Asia/Seoul
-#    username: root
-#    password: memodbdb
-    url: jdbc:mysql://localhost:3306/memo?&serverTimezone=Asia/Seoul
+    url: jdbc:mysql://awsmemodb.cz4coeuywybx.ap-northeast-2.rds.amazonaws.com:3306/memo?&serverTimezone=Asia/Seoul
     username: root
-    password: 1234
+    password: memodbdb
+#    url: jdbc:mysql://localhost:3306/memo?&serverTimezone=Asia/Seoul
+#    username: root
+#    password: 1234
   jpa:
     hibernate:
       ddl-auto: update
