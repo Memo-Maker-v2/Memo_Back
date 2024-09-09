@@ -16,15 +16,15 @@ public class OpenAIUtils {
   private String apiKey;
   
   private static final String API_URL = "https://api.openai.com/v1/chat/completions";
-  private static final int MAX_TOKENS = 15000; // GPT-3.5-turbo의 최대 토큰 수를 고려하여 보수적으로 설정
-  private static final int MAX_SUMMARY_TOKENS = 2048; // 요약 요청 시 최대 토큰 수
+  private static final int MAX_TOKENS = 8000; // GPT-3.5-turbo의 최대 토큰 수를 고려하여 보수적으로 설정
+  private static final int MAX_RESPONSE_TOKENS = 3000; // GPT-3.5-turbo의 최대 토큰 수를 고려하여 보수적으로 설정
   
   // 자막과 언어 정보를 받아 GPT-3.5-turbo를 통해 요약본을 생성하는 메소드
   public String summarizeTranscript(String transcript, String language) throws IOException {
     OkHttpClient client = new OkHttpClient();
     MediaType mediaType = MediaType.parse("application/json");
     
-    List<String> transcriptParts = splitTranscript(transcript, MAX_TOKENS);
+    List<String> transcriptParts = splitText(transcript);
     
     StringBuilder summaryBuilder = new StringBuilder();
     
@@ -48,7 +48,6 @@ public class OpenAIUtils {
       messagesArray.put(userMessage);
       
       json.put("messages", messagesArray);
-      json.put("max_tokens", MAX_SUMMARY_TOKENS);
       
       RequestBody body = RequestBody.create(mediaType, json.toString());
       Request request = new Request.Builder()
@@ -91,7 +90,7 @@ public class OpenAIUtils {
     message.put("content", question);
     
     json.put("messages", new JSONArray().put(message));
-    json.put("max_tokens", 2048);
+    json.put("max_tokens", MAX_RESPONSE_TOKENS);
     
     RequestBody body = RequestBody.create(mediaType, json.toString());
     Request request = new Request.Builder()
@@ -102,6 +101,7 @@ public class OpenAIUtils {
             .build();
     
     Response response = client.newCall(request).execute();
+    assert response.body() != null;
     String responseBody = response.body().string();
     
     if (response.isSuccessful()) {
@@ -111,55 +111,74 @@ public class OpenAIUtils {
     }
   }
   
-  public String summarizeText(String text, String language) throws IOException {
+  // PDF 문서의 텍스트와 언어 정보를 받아 GPT-3.5-turbo를 통해 요약본을 생성하는 메소드
+  public String summarizePDF(String text, String language) throws IOException {
     OkHttpClient client = new OkHttpClient();
     MediaType mediaType = MediaType.parse("application/json");
     
-    JSONObject json = new JSONObject();
-    json.put("model", "gpt-3.5-turbo");
+    System.out.println("text = " + text);
     
-    JSONArray messagesArray = new JSONArray();
+    // 긴 텍스트를 나누어 처리할 부분 리스트를 생성
+    List<String> textParts = splitText(text);
     
-    // 시스템 메시지: 요약에 필요한 정보를 제공하는 부분
-    JSONObject systemMessage = new JSONObject();
-    systemMessage.put("role", "system");
+    // 요약 결과를 저장할 StringBuilder 생성
+    StringBuilder finalSummary = new StringBuilder();
     
-    // 프롬프트 생성: PDF 텍스트와 언어 정보를 포함하여 요약 요청
-    String prompt = "This text was extracted from a PDF document written in " + language + ". "
-            + "Please summarize the content of each page in " + language + ". Indicate the page number at the beginning of each summary, like 'Page 1:', 'Page 2:', and so on. "
-            + "Please ensure that the summaries are written in " + language + " and provide detailed and thorough explanations for each point.";
-    
-    
-    systemMessage.put("content", prompt);
-    
-    // 사용자 메시지: 실제 추출된 텍스트를 전달
-    JSONObject userMessage = new JSONObject();
-    userMessage.put("role", "user");
-    userMessage.put("content", text);
-    
-    messagesArray.put(systemMessage);
-    messagesArray.put(userMessage);
-    
-    json.put("messages", messagesArray);
-    json.put("max_tokens", 2048);
-    
-    RequestBody body = RequestBody.create(mediaType, json.toString());
-    Request request = new Request.Builder()
-            .url(API_URL)
-            .post(body)
-            .addHeader("Content-Type", "application/json")
-            .addHeader("Authorization", "Bearer " + apiKey)
-            .build();
-    
-    Response response = client.newCall(request).execute();
-    String responseBody = response.body().string();
-    
-    if (response.isSuccessful()) {
-      return parseResponse(responseBody);
-    } else {
-      throw new IOException("OpenAI API request failed: " + responseBody);
+    for (String part : textParts) {
+      // 각 부분에 대해 GPT-3.5-turbo에 요청을 보낼 JSON 객체 생성
+      JSONObject json = new JSONObject();
+      json.put("model", "gpt-3.5-turbo");
+      
+      JSONArray messagesArray = new JSONArray();
+      
+      // 시스템 메시지 추가
+      JSONObject systemMessage = new JSONObject();
+      systemMessage.put("role", "system");
+      
+      // 프롬프트 생성: 페이지별 요약 요청
+      String prompt = "This text was extracted from a PDF document written in " + language + ". "
+              + "Please summarize the content of each page in " + language + ". Indicate the page number at the beginning of each summary, like 'Page 1:', 'Page 2:', and so on. "
+              + "Please ensure that the summaries are written in " + language + " and provide detailed and thorough explanations for each point.";
+      
+      systemMessage.put("content", prompt);
+      
+      // 사용자 메시지: 현재 처리할 부분의 텍스트
+      JSONObject userMessage = new JSONObject();
+      userMessage.put("role", "user");
+      userMessage.put("content", part);
+      
+      // 메시지 배열에 시스템 메시지와 사용자 메시지 추가
+      messagesArray.put(systemMessage);
+      messagesArray.put(userMessage);
+      
+      json.put("messages", messagesArray);
+      json.put("max_tokens", MAX_RESPONSE_TOKENS); // 응답의 최대 토큰 수 설정
+      
+      RequestBody body = RequestBody.create(mediaType, json.toString());
+      Request request = new Request.Builder()
+              .url(API_URL)
+              .post(body)
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Authorization", "Bearer " + apiKey)
+              .build();
+      
+      // 요청 실행 및 응답 처리
+      Response response = client.newCall(request).execute();
+      String responseBody = response.body().string();
+      
+      if (response.isSuccessful()) {
+        // 응답을 파싱하여 요약 결과를 StringBuilder에 추가
+        finalSummary.append(parseResponse(responseBody)).append("\n\n");
+      } else {
+        System.err.println("OpenAI API request failed: " + responseBody);
+      }
     }
+    
+    // 모든 부분 요약을 합쳐서 반환
+    return finalSummary.toString().trim();
   }
+  
+  
   
   
   
@@ -174,7 +193,7 @@ public class OpenAIUtils {
   }
   
   // 자막을 토큰 수에 맞게 나누는 메소드
-  private List<String> splitTranscript(String transcript, int maxTokens) {
+  private List<String> splitText(String transcript) {
     List<String> parts = new ArrayList<>();
     StringBuilder currentPart = new StringBuilder();
     int currentTokenCount = 0;
@@ -186,7 +205,7 @@ public class OpenAIUtils {
       int sentenceTokenCount = countTokens(sentence);
       
       // 현재 파트의 토큰 수와 문장 토큰 수를 더한 값이 최대 토큰 수를 초과하면
-      if (currentTokenCount + sentenceTokenCount > maxTokens) {
+      if (currentTokenCount + sentenceTokenCount > MAX_TOKENS) {
         // 현재 파트가 비어있지 않으면 파트를 저장하고 리셋
         if (currentPart.length() > 0) {
           parts.add(currentPart.toString().trim());
