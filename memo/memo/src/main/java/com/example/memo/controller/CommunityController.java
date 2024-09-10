@@ -18,7 +18,7 @@ public class CommunityController {
         this.videoService = videoService;
     }
     //게시된 비디오만 불러오기
-    @GetMapping("/published-videos")
+    @GetMapping
     @CrossOrigin("*")
     public ResponseEntity<List<VideoDto>> getPublishedVideos() {
         List<VideoDto> videos = videoService.findPublishedVideos();
