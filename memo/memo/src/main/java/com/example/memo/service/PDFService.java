@@ -56,13 +56,13 @@ public class PDFService {
     // PDF 파일에서 텍스트 추출
     String text = extractTextFromPDF(filePath.toFile());
     
-//    System.out.println("text = " + text);
+    System.out.println("text = " + text);
     
     // OpenAI를 사용하여 텍스트 요약
-    String summary = openAIUtils.summarizePDF(text, language);
+    String summary = openAIUtils.summarize(text, language, "pdf");
     
     // 요약 결과 출력
-    System.out.println("Summary: ");
+    System.out.println("PDFSummary: ");
     System.out.println(summary);
     
     // 요약 결과 반환
