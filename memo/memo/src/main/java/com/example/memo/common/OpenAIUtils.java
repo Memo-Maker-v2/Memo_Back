@@ -31,6 +31,7 @@ public class OpenAIUtils {
   public String summarize(String text, String language, String mode) throws IOException {
     MediaType mediaType = MediaType.parse("application/json");
     
+    System.out.println("text.length = " + text.length());
     // 긴 텍스트를 나누어 처리할 부분 리스트를 생성
     List<String> textParts = splitText(text);
     
@@ -41,7 +42,7 @@ public class OpenAIUtils {
     for (String part : textParts) {
       // JSON 객체 생성
       JSONObject json = new JSONObject();
-      json.put("model", "gpt-3.5-turbo");
+      json.put("model", "gpt-4o-mini");
       
       JSONArray messagesArray = new JSONArray();
       
