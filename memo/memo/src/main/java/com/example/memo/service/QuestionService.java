@@ -26,6 +26,7 @@ public class QuestionService {
     @Transactional
     public QuestionEntity saveQuestion(QuestionDto questionDto) throws Exception {
         String memberEmail = questionDto.getMemberEmail();  // DTO에서 값 추출
+        System.out.println("qmemberEmail = " + memberEmail);
         if (memberEmail == null) {
             throw new IllegalArgumentException("Member email is missing in the request.");
         }
@@ -35,23 +36,28 @@ public class QuestionService {
             /*throw new UserNotFoundException("User not found: " + memberEmail);  // 멤버가 없을 때 예외 처리*/
             throw new Exception();
         }
-
+        System.out.println("member = " + member);
+        
         String videoUrl = questionDto.getVideoUrl();
         if (videoUrl == null) {
             throw new IllegalArgumentException("VideoUrl is missing in the request.");
         }
-
+        System.out.println("videoUrl = " + videoUrl);
+        
+        System.out.println("videoRepository.findByVideoUrl(videoUrl)="+videoRepository.findByVideoUrl(videoUrl));
+        
         VideoEntity video = videoRepository.findByVideoUrl(videoUrl);  // 비디오url 찾기
         if (video == null) {
             throw new Exception();
         }
-
+        System.out.println("video = " + video);
+        
         QuestionEntity questionEntity = new QuestionEntity();
         questionEntity.setQuestion(questionDto.getQuestion());
         questionEntity.setAnswer(questionDto.getAnswer());
         questionEntity.setMemberEmail(questionDto.getMemberEmail());  // 외래 키 설정
         questionEntity.setVideoUrl(questionDto.getVideoUrl());
-
+        System.out.println("questionEntity = " + questionEntity);
         return questionRepository.save(questionEntity);
     }
 }
