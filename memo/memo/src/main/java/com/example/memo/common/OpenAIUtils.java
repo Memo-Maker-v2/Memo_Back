@@ -18,8 +18,8 @@ public class OpenAIUtils {
   private String apiKey;
   
   private static final String API_URL = "https://api.openai.com/v1/chat/completions";
-  private static final int MAX_TOKENS = 5000; // GPT-3.5-turbo의 최대 토큰 수를 고려하여 보수적으로 설정
-  private static final int MAX_RESPONSE_TOKENS = 3000; // GPT-3.5-turbo의 최대 토큰 수를 고려하여 보수적으로 설정
+  private static final int MAX_TOKENS = 10000; // GPT-3.5-turbo의 최대 토큰 수를 고려하여 보수적으로 설정
+  private static final int MAX_RESPONSE_TOKENS = 5000; // GPT-3.5-turbo의 최대 토큰 수를 고려하여 보수적으로 설정
   
   private final OkHttpClient client = new OkHttpClient.Builder()
           .connectTimeout(30, TimeUnit.SECONDS)
