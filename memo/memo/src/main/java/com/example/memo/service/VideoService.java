@@ -180,15 +180,7 @@ public class VideoService {
     public List<VideoDto> findPublishedVideos() {
         List<VideoEntity> videoEntities = videoRepository.findByIsPublishedTrue();
         return videoEntities.stream()
-                .map(videoEntity -> new VideoDto(
-                        videoEntity.getVideoUrl(),
-                        videoEntity.getThumbnailUrl(),
-                        videoEntity.getVideoTitle(),
-                        videoEntity.getCategoryName(),
-                        videoEntity.getFilter(),
-                        videoEntity.getDocumentDate(),
-                        videoEntity.getIsPublished(),
-                        videoEntity.getViewCount()))
+                .map(VideoDto::new) // VideoEntity를 VideoDto로 변환
                 .collect(Collectors.toList());
     }
     // memberEmail과 videoUrl을 사용하여 VideoDto를 가져오는 메서드
