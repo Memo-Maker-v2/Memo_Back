@@ -299,7 +299,7 @@ public class YoutubeService {
     int attempt = 0;
     while (attempt < MAX_RETRIES) {
       try {
-        String summary = openAIUtils.summarizeTranscript(transcript, subtitleLanguage);
+        String summary = openAIUtils.summarize(transcript, subtitleLanguage, "youtube");
         System.out.println("Generated Summary in " + subtitleLanguage + ": \n" + summary);
         return summary;
       } catch (IOException e) {

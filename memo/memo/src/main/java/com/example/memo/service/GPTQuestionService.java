@@ -26,36 +26,55 @@ public class GPTQuestionService {
    * @throws Exception API 요청 실패 시
    */
   public String askQuestion(GPTQuestionDto gptQuestionDto) throws Exception {
-    String answer = openAIUtils.askQuestion(gptQuestionDto.getQuestion());
-    postToFlask(gptQuestionDto.getMemberEmail(), gptQuestionDto.getVideoUrl(), gptQuestionDto.getQuestion(), answer);
-    return answer;
+    try {
+      System.out.println("gptQuestionDto = " + gptQuestionDto);
+      String answer = openAIUtils.askQuestion(gptQuestionDto.getQuestion());
+      System.out.println("answer = " + answer);
+      postToFlask(gptQuestionDto.getMemberEmail(), gptQuestionDto.getVideoUrl(), gptQuestionDto.getQuestion(), answer);
+      System.out.println("finish postToFlask");
+      return answer;
+    } catch (IOException e) {
+      System.err.println("IOException during Flask API call: " + e.getMessage());
+      throw e;
+    } catch (Exception e) {
+      System.err.println("Unexpected exception: " + e.getMessage());
+      e.printStackTrace();  // stack trace를 출력합니다.
+      throw e;
+    }
   }
   
   private void postToFlask(String memberEmail, String videoUrl, String question, String answer) throws IOException {
+    System.out.println("memberEmail = " + memberEmail);
+    System.out.println("videoUrl = " + videoUrl);
+    System.out.println("answer = " + answer);
     OkHttpClient client = new OkHttpClient();
     MediaType mediaType = MediaType.parse("application/json");
     
-    // JSON 객체 생성
     JSONObject json = new JSONObject();
     json.put("memberEmail", memberEmail);
     json.put("videoUrl", videoUrl);
     json.put("question", question);
     json.put("answer", answer);
     
-    // JSON 객체를 RequestBody로 변환
     RequestBody body = RequestBody.create(mediaType, json.toString());
     
-    // POST 요청 생성
     Request request = new Request.Builder()
             .url(FLASK_API_URL)
             .post(body)
             .addHeader("Content-Type", "application/json")
             .build();
     
-    // 요청 실행 및 응답 처리
-    Response response = client.newCall(request).execute();
-    if (!response.isSuccessful()) {
-      throw new IOException("Failed to send data to Flask API: " + response);
+    // 요청 및 응답 처리
+    try (Response response = client.newCall(request).execute()) {
+      if (!response.isSuccessful()) {
+        System.err.println("Failed to send data to Flask API. Response: " + response);
+        throw new IOException("Failed to send data to Flask API: " + response);
+      }
+      System.out.println("Successfully posted to Flask API. Response: " + response);
+    } catch (IOException e) {
+      System.err.println("IOException occurred while posting to Flask API: " + e.getMessage());
+      throw e;
     }
   }
+  
 }
