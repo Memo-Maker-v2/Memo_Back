@@ -1,9 +1,12 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/memo?&serverTimezone=Asia/Seoul
+    url: jdbc:mysql://awsmemodb.cz4coeuywybx.ap-northeast-2.rds.amazonaws.com:3306/memo?&serverTimezone=Asia/Seoul
     username: root
-    password: 1234
+    password: memodbdb
+#    url: jdbc:mysql://localhost:3306/memo?&serverTimezone=Asia/Seoul
+#    username: root
+#    password: 1234
   jpa:
     hibernate:
       ddl-auto: update
@@ -30,7 +33,10 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
-
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
 
 
 secret-key: ThisStatementIsJwtSecretKeyDoNotUseThisStatement;

@@ -4,6 +4,8 @@ import okhttp3.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,28 +18,38 @@ public class OpenAIUtils {
   private String apiKey;
   
   private static final String API_URL = "https://api.openai.com/v1/chat/completions";
-  private static final int MAX_TOKENS = 15000; // GPT-3.5-turbo의 최대 토큰 수를 고려하여 보수적으로 설정
-  private static final int MAX_SUMMARY_TOKENS = 2048; // 요약 요청 시 최대 토큰 수
+  private static final int MAX_TOKENS = 10000; // GPT-3.5-turbo의 최대 토큰 수를 고려하여 보수적으로 설정
+  private static final int MAX_RESPONSE_TOKENS = 5000; // GPT-3.5-turbo의 최대 토큰 수를 고려하여 보수적으로 설정
   
-  // 자막과 언어 정보를 받아 GPT-3.5-turbo를 통해 요약본을 생성하는 메소드
-  public String summarizeTranscript(String transcript, String language) throws IOException {
-    OkHttpClient client = new OkHttpClient();
+  private final OkHttpClient client = new OkHttpClient.Builder()
+          .connectTimeout(30, TimeUnit.SECONDS)
+          .writeTimeout(30, TimeUnit.SECONDS)
+          .readTimeout(60, TimeUnit.SECONDS)
+          .build();
+  
+  // 다양한 문서 유형에 따라 요약본을 생성하는 메소드
+  public String summarize(String text, String language, String mode) throws IOException {
     MediaType mediaType = MediaType.parse("application/json");
     
-    List<String> transcriptParts = splitTranscript(transcript, MAX_TOKENS);
+    System.out.println("text.length = " + text.length());
+    // 긴 텍스트를 나누어 처리할 부분 리스트를 생성
+    List<String> textParts = splitText(text);
     
-    StringBuilder summaryBuilder = new StringBuilder();
+    // 요약 결과를 저장할 StringBuilder 생성
+    StringBuilder finalSummary = new StringBuilder();
     
-    for (String part : transcriptParts) {
+    // 각 텍스트 파트를 처리
+    for (String part : textParts) {
+      // JSON 객체 생성
       JSONObject json = new JSONObject();
-      json.put("model", "gpt-3.5-turbo");
+      json.put("model", "gpt-4o-mini");
       
       JSONArray messagesArray = new JSONArray();
       
-      // 시스템 메시지 추가
+      // 시스템 메시지 생성
       JSONObject systemMessage = new JSONObject();
       systemMessage.put("role", "system");
-      systemMessage.put("content", "Please analyze the following transcript and provide a summary with subheadings and brief descriptions in " + language + ". Include appropriate emojis with the subheadings and descriptions without an introduction or closing remark.");
+      systemMessage.put("content", generatePrompt(mode, language));
       
       // 사용자 메시지 추가
       JSONObject userMessage = new JSONObject();
@@ -48,8 +60,9 @@ public class OpenAIUtils {
       messagesArray.put(userMessage);
       
       json.put("messages", messagesArray);
-      json.put("max_tokens", MAX_SUMMARY_TOKENS);
+      json.put("max_tokens", MAX_RESPONSE_TOKENS);
       
+      // 요청 생성 및 실행
       RequestBody body = RequestBody.create(mediaType, json.toString());
       Request request = new Request.Builder()
               .url(API_URL)
@@ -62,13 +75,15 @@ public class OpenAIUtils {
       String responseBody = response.body().string();
       
       if (response.isSuccessful()) {
-        summaryBuilder.append(parseResponse(responseBody)).append("\n\n");
+        // 응답을 파싱하여 요약 결과를 StringBuilder에 추가
+        finalSummary.append(parseResponse(responseBody)).append("\n\n");
       } else {
         System.err.println("OpenAI API request failed: " + responseBody);
       }
     }
     
-    return summaryBuilder.toString().trim();
+    // 모든 부분 요약을 합쳐서 반환
+    return finalSummary.toString().trim();
   }
   
   /**
@@ -79,7 +94,6 @@ public class OpenAIUtils {
    * @throws IOException API 요청 실패 시
    */
   public String askQuestion(String question) throws IOException {
-    OkHttpClient client = new OkHttpClient();
     MediaType mediaType = MediaType.parse("application/json");
     
     JSONObject json = new JSONObject();
@@ -91,7 +105,7 @@ public class OpenAIUtils {
     message.put("content", question);
     
     json.put("messages", new JSONArray().put(message));
-    json.put("max_tokens", 150);
+    json.put("max_tokens", MAX_RESPONSE_TOKENS);
     
     RequestBody body = RequestBody.create(mediaType, json.toString());
     Request request = new Request.Builder()
@@ -102,6 +116,7 @@ public class OpenAIUtils {
             .build();
     
     Response response = client.newCall(request).execute();
+    assert response.body() != null;
     String responseBody = response.body().string();
     
     if (response.isSuccessful()) {
@@ -122,7 +137,7 @@ public class OpenAIUtils {
   }
   
   // 자막을 토큰 수에 맞게 나누는 메소드
-  private List<String> splitTranscript(String transcript, int maxTokens) {
+  private List<String> splitText(String transcript) {
     List<String> parts = new ArrayList<>();
     StringBuilder currentPart = new StringBuilder();
     int currentTokenCount = 0;
@@ -134,7 +149,7 @@ public class OpenAIUtils {
       int sentenceTokenCount = countTokens(sentence);
       
       // 현재 파트의 토큰 수와 문장 토큰 수를 더한 값이 최대 토큰 수를 초과하면
-      if (currentTokenCount + sentenceTokenCount > maxTokens) {
+      if (currentTokenCount + sentenceTokenCount > MAX_TOKENS) {
         // 현재 파트가 비어있지 않으면 파트를 저장하고 리셋
         if (currentPart.length() > 0) {
           parts.add(currentPart.toString().trim());
@@ -160,5 +175,18 @@ public class OpenAIUtils {
     // 텍스트의 길이를 기준으로 토큰 수를 추정
     // 영어 기준: 약 1단어당 1.33 토큰, 한국어 기준: 약 1문자당 1.33 토큰
     return (int) (text.length() / 1.33);
+  }
+  
+  // 모드에 따라 적절한 프롬프트를 생성하는 메소드
+  private String generatePrompt(String mode, String language) {
+    if ("youtube".equalsIgnoreCase(mode)) {
+      return "Please analyze the following transcript and provide a summary with subheadings and brief descriptions in " + language + ". Include appropriate emojis with the subheadings and descriptions without an introduction or closing remark.";
+    } else if ("pdf".equalsIgnoreCase(mode)) {
+      return "This text was extracted from a PDF document written in " + language + ". "
+              + "Please summarize the content of each page in " + language + ". Indicate the page number at the beginning of each summary, like 'Page 1:', 'Page 2:', and so on. "
+              + "Please ensure that the summaries are written in " + language + " and provide detailed and thorough explanations for each point.";
+    } else {
+      throw new IllegalArgumentException("Invalid mode: " + mode);
+    }
   }
 }
