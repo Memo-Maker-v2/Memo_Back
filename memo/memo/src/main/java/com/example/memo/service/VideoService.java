@@ -207,31 +207,14 @@ public class VideoService {
     public List<VideoDto> findPublishedVideosByPopularity() {
         List<VideoEntity> videoEntities = videoRepository.findByIsPublishedTrueOrderByViewCountDesc();
         return videoEntities.stream()
-                .map(videoEntity -> new VideoDto(
-                        videoEntity.getVideoUrl(),
-                        videoEntity.getThumbnailUrl(),
-                        videoEntity.getVideoTitle(),
-                        videoEntity.getCategoryName(),
-                        videoEntity.getFilter(),
-                        videoEntity.getDocumentDate(),
-                        videoEntity.getIsPublished(),
-                        videoEntity.getViewCount()
-                ))
+                .map(VideoDto::new) // VideoEntity를 VideoDto로 변환
                 .collect(Collectors.toList());
     }
     @Transactional(readOnly = true)
     public List<VideoDto> findLatestPublishedVideos() {
         List<VideoEntity> videoEntities = videoRepository.findByIsPublishedTrueOrderByDocumentDateDesc();
         return videoEntities.stream()
-                .map(videoEntity -> new VideoDto(
-                        videoEntity.getVideoUrl(),
-                        videoEntity.getThumbnailUrl(),
-                        videoEntity.getVideoTitle(),
-                        videoEntity.getCategoryName(),
-                        videoEntity.getFilter(),
-                        videoEntity.getDocumentDate(),
-                        videoEntity.getIsPublished(),
-                        videoEntity.getViewCount()))
+                .map(VideoDto::new) // VideoEntity를 VideoDto로 변환
                 .collect(Collectors.toList());
     }
     // 제목으로 비디오를 검색하는 메서드
@@ -239,15 +222,7 @@ public class VideoService {
     public List<VideoDto> findVideosByTitle(String title) {
         List<VideoEntity> videoEntities = videoRepository.findByVideoTitleContainingAndIsPublishedTrue(title);
         return videoEntities.stream()
-                .map(videoEntity -> new VideoDto(
-                        videoEntity.getVideoUrl(),
-                        videoEntity.getThumbnailUrl(),
-                        videoEntity.getVideoTitle(),
-                        videoEntity.getCategoryName(),
-                        videoEntity.getFilter(),
-                        videoEntity.getDocumentDate(),
-                        videoEntity.getIsPublished(),
-                        videoEntity.getViewCount()))
+                .map(VideoDto::new) // VideoEntity를 VideoDto로 변환
                 .collect(Collectors.toList());
     }
     // 비디오의 summary 정보를 업데이트하는 메서드
