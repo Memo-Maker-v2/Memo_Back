@@ -11,8 +11,12 @@ import com.example.memo.service.implement.SavedVideoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -41,31 +45,33 @@ public class SavedVideoService {
                     savedVideo.getMember().getMemberEmail(),
                     savedVideo.getSavedDate()
             );
-
-            // 필요한 경우 추가 정보를 설정합니다.
-            if (video != null) {
-                savedVideoDTO.setVideoTitle(video.getVideoTitle());
-            }
-
-            if (member != null) {
-                savedVideoDTO.setMemberName(member.getMemberName());
-            }
-
             return savedVideoDTO;
         }).collect(Collectors.toList());
     }
+    // 좋아요 누른 영상을 저장하는 메서드
+    public void saveVideo(String memberEmail, long videoId) {
+        // MemberEntity 및 VideoEntity 조회
+        MemberEntity member = memberRepository.findByMemberEmail(memberEmail);
+        VideoEntity video = videoRepository.findById(videoId).orElseThrow(() -> new RuntimeException("Video not found"));
 
-    private VideoDto convertToDto(VideoEntity videoEntity) {
-        return new VideoDto(
-                videoEntity.getVideoUrl(),
-                videoEntity.getThumbnailUrl(),
-                videoEntity.getVideoTitle(),
-                videoEntity.getCategoryName(),
-                videoEntity.getFilter(),
-                videoEntity.getDocumentDate(),
-                videoEntity.getIsPublished(),
-                videoEntity.getViewCount()
+        // SavedVideoEntity 생성 및 설정
+        SavedVideoEntity savedVideo = new SavedVideoEntity();
+        savedVideo.setMember(member);
+        savedVideo.setVideo(video);
+        savedVideo.setSavedDate(LocalDate.now());
 
-        );
+        // 저장
+        savedVideoRepository.save(savedVideo);
+    }
+    @Transactional
+    // 좋아요 취소 또는 저장된 비디오 삭제 메서드
+    public void deleteVideo(String memberEmail, long videoId) {
+        // 저장된 비디오가 있는지 확인 후 삭제
+        SavedVideoEntity savedVideo = savedVideoRepository.findByVideo_VideoIdAndMember_MemberEmail(videoId, memberEmail);
+        if (savedVideo != null) {
+            savedVideoRepository.deleteByVideo_VideoIdAndMember_MemberEmail(videoId, memberEmail);
+        } else {
+            throw new RuntimeException("Saved video not found for deletion");
+        }
     }
 }
