@@ -21,20 +21,22 @@ public class SavedVideoController {
         String memberEmail = request.get("memberEmail");
         return savedVideoService.getAllSavedVideos(memberEmail);
     }
-//    @PostMapping("/get-video")
-//    public Optional<VideoDto> getVideoById(@RequestBody VideoIdRequest videoIdRequest) {
-//        return savedVideoService.getVideoById(videoIdRequest.getVideoId());
-//    }
-//
-//    public static class VideoIdRequest {
-//        private long videoId;
-//
-//        public long getVideoId() {
-//            return videoId;
-//        }
-//
-//        public void setVideoId(long videoId) {
-//            this.videoId = videoId;
-//        }
-//    }
+    // 좋아요 버튼을 눌렀을 때 영상을 저장하는 엔드포인트
+    @PostMapping("/like")
+    public String likeVideo(@RequestBody Map<String, String> request) {
+        String memberEmail = request.get("memberEmail");
+        long videoId = Long.parseLong(request.get("videoId"));
+
+        savedVideoService.saveVideo(memberEmail, videoId);
+        return "Video liked and saved!";
+    }
+    // 좋아요 취소 또는 비디오 삭제 엔드포인트
+    @DeleteMapping("/unlike")
+    public String unlikeVideo(@RequestBody Map<String, String> request) {
+        String memberEmail = request.get("memberEmail");
+        long videoId = Long.parseLong(request.get("videoId"));
+
+        savedVideoService.deleteVideo(memberEmail, videoId);
+        return "Video unliked and deleted!";
+    }
 }
