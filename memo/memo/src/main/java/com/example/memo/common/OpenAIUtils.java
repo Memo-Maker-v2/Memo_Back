@@ -97,8 +97,8 @@ public class OpenAIUtils {
     MediaType mediaType = MediaType.parse("application/json");
     
     JSONObject json = new JSONObject();
-    json.put("model", "gpt-3.5-turbo");
-    
+    json.put("model", "gpt-4o-mini");
+
     // 사용자 메시지 추가
     JSONObject message = new JSONObject();
     message.put("role", "user");
