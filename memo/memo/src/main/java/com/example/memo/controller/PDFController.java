@@ -1,5 +1,6 @@
 package com.example.memo.controller;
 
+import com.example.memo.dto.PDFRequestDTO;
 import com.example.memo.dto.PDFResponseDTO;
 import com.example.memo.service.PDFService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping("/api/v1/files")
@@ -64,31 +67,50 @@ public class PDFController {
   }
   
   @PostMapping("/getpdffile")
-  public ResponseEntity<?> getPDFByEmailAndTitle(
-          @RequestPart("memberEmail") String memberEmail,
-          @RequestPart("pdfTitle") String pdfTitle) {
-    
+  public ResponseEntity<FileSystemResource> getPDFByEmailAndTitle(
+          @RequestBody PDFRequestDTO requestDTO) {
     try {
-      // PDF 메타데이터 및 파일을 서비스로부터 조회
-      PDFResponseDTO pdfResponseDTO = pdfService.getPDFByEmailAndTitle(memberEmail, pdfTitle);
+      String memberEmail = requestDTO.getMemberEmail();
+      String pdfTitle = requestDTO.getPdfTitle();
       
-      // 파일 경로 가져오기
       File pdfFile = pdfService.getPDFFile(memberEmail, pdfTitle);
       
-      // 파일이 존재하지 않으면 404 반환
       if (!pdfFile.exists()) {
-        return ResponseEntity.status(404).body("PDF file not found");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
       }
       
-      // 파일과 메타데이터를 반환 (Multipart 반환)
-      return ResponseEntity.ok()
-              .header("Content-Disposition", "attachment; filename=\"" + pdfFile.getName() + "\"")
-              .header("Content-Type", "application/pdf")
-              .body(new org.springframework.core.io.FileSystemResource(pdfFile));
+      FileSystemResource fileResource = new FileSystemResource(pdfFile);
+      String encodedFileName = URLEncoder.encode(pdfFile.getName(), StandardCharsets.UTF_8.toString())
+              .replaceAll("\\+", "%20");
+      
+      HttpHeaders headers = new HttpHeaders();
+      headers.setContentType(MediaType.APPLICATION_PDF);
+      headers.setContentDispositionFormData("attachment", encodedFileName);
+      System.out.println("💨");
+      return new ResponseEntity<>(fileResource, headers, HttpStatus.OK);
       
     } catch (IOException e) {
-      return ResponseEntity.status(500).body("Error while fetching PDF: " + e.getMessage());
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
-  
+  @PostMapping("/getpdfinfo")
+  public ResponseEntity<PDFResponseDTO> getPDFInfo(
+          @RequestBody PDFRequestDTO requestDTO) {
+    try {
+      String memberEmail = requestDTO.getMemberEmail();
+      String pdfTitle = requestDTO.getPdfTitle();
+      
+      // PDF 정보 조회
+      PDFResponseDTO pdfResponseDTO = pdfService.getPDFByEmailAndTitle(memberEmail, pdfTitle);
+      
+      if (pdfResponseDTO == null) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+      }
+      
+      return ResponseEntity.ok(pdfResponseDTO);
+      
+    } catch (IOException e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    }
+  }
 }
