@@ -2,13 +2,18 @@ package com.example.memo.controller;
 
 import com.example.memo.dto.SavedVideoDto;
 import com.example.memo.dto.video.VideoDto;
+import com.example.memo.entity.MemberEntity;
+import com.example.memo.repository.MemberRepository;
 import com.example.memo.service.SavedVideoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/video")
@@ -16,6 +21,8 @@ public class SavedVideoController {
     @Autowired
     private SavedVideoService savedVideoService;
 
+    @Autowired
+    private MemberRepository memberRepository;
     @PostMapping("/saved-videos")
     public List<SavedVideoDto> getSavedVideos(@RequestBody Map<String, String> request) {
         String memberEmail = request.get("memberEmail");
