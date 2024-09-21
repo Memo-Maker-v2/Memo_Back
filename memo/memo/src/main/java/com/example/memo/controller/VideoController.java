@@ -74,7 +74,7 @@ public class VideoController {
         String memberEmail = requestBody.get("memberEmail");
         String videoUrl = requestBody.get("videoUrl");
         String newFilter = requestBody.get("filter");
-
+        System.out.println("memberEmail = " + memberEmail + ", videoUrl = " + videoUrl + ", newFilter = " + newFilter);
         if (memberEmail == null || videoUrl == null || newFilter == null) {
             return ResponseEntity.badRequest().body("Missing memberEmail, videoUrl, or filter");
         }
