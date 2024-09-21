@@ -110,14 +110,14 @@ public class VideoService {
     public List<VideoDto> findVideosByCategoryAndMemberEmail(String categoryName, String memberEmail) {
         List<VideoEntity> videos = videoRepository.findByCategoryNameAndMemberEmail(categoryName, memberEmail);
         return videos.stream()
-                .map(video -> new VideoDto(video.getVideoUrl(), video.getThumbnailUrl(), video.getVideoTitle(),video.getCategoryName()))
+                .map(VideoDto::new) // VideoEntity를 VideoDto로 변환
                 .collect(Collectors.toList());
     }
     //memberEmail로 모든 영상을 조회
     public List<VideoDto> findVideosByMemberEmail(String memberEmail) {
         List<VideoEntity> videos = videoRepository.findByMemberEmail(memberEmail);
         return videos.stream()
-                .map(video -> new VideoDto(video.getVideoUrl(), video.getThumbnailUrl(), video.getVideoTitle(), video.getCategoryName()))
+                .map(VideoDto::new) // VideoEntity를 VideoDto로 변환
                 .collect(Collectors.toList());
     }
     // 비디오의 isPublished 값을 업데이트하는 메서드
@@ -246,6 +246,14 @@ public class VideoService {
 
         videoEntity.setFullScript(newFullScript);
         videoRepository.save(videoEntity);
+    }
+    // videoId로 비디오 조회
+    @Transactional(readOnly = true)
+    public VideoDto findVideoById(Long videoId) {
+        VideoEntity videoEntity = videoRepository.findById(videoId)
+                .orElseThrow(() -> new IllegalStateException("Video not found for the provided ID"));
+
+        return new VideoDto(videoEntity); // 모든 필드를 포함하는 생성자를 사용
     }
 
 }

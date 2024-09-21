@@ -71,10 +71,11 @@ public class VideoController {
     @PutMapping("/update-filter")
     @CrossOrigin("*")
     public ResponseEntity<String> updateVideoFilter(@RequestBody Map<String, String> requestBody) {
+        System.out.println("/update-filter 실행된다");
         String memberEmail = requestBody.get("memberEmail");
         String videoUrl = requestBody.get("videoUrl");
         String newFilter = requestBody.get("filter");
-
+        System.out.println("memberEmail = " + memberEmail + ", videoUrl = " + videoUrl + ", newFilter = " + newFilter);
         if (memberEmail == null || videoUrl == null || newFilter == null) {
             return ResponseEntity.badRequest().body("Missing memberEmail, videoUrl, or filter");
         }
@@ -196,4 +197,28 @@ public class VideoController {
         boolean exists = videoService.videoExists(videoDto.getMemberEmail(), videoDto.getVideoUrl());
         return ResponseEntity.ok(exists);
     }
+    // videoId로 비디오 정보를 반환
+    @PostMapping("/details")
+    @CrossOrigin("*")
+    public ResponseEntity<VideoDto> getVideoById(@RequestBody Map<String, Long> requestBody) {
+        Long videoId = requestBody.get("videoId");
+
+        if (videoId == null) {
+            return ResponseEntity.badRequest().body(null); // videoId가 없으면 bad request
+        }
+
+        try {
+            // videoId로 비디오 정보 조회
+            VideoDto videoDto = videoService.findVideoById(videoId);
+
+            if (videoDto != null) {
+                return ResponseEntity.ok(videoDto);
+            } else {
+                return ResponseEntity.notFound().build(); // 비디오가 없으면 404
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build(); // 서버 에러 처리
+        }
+    }
+
 }
