@@ -110,7 +110,7 @@ public class VideoService {
     public List<VideoDto> findVideosByCategoryAndMemberEmail(String categoryName, String memberEmail) {
         List<VideoEntity> videos = videoRepository.findByCategoryNameAndMemberEmail(categoryName, memberEmail);
         return videos.stream()
-                .map(video -> new VideoDto(video.getVideoUrl(), video.getThumbnailUrl(), video.getVideoTitle(),video.getCategoryName()))
+                .map(VideoDto::new) // VideoEntity를 VideoDto로 변환
                 .collect(Collectors.toList());
     }
     //memberEmail로 모든 영상을 조회
