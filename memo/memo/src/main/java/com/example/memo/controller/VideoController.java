@@ -71,6 +71,7 @@ public class VideoController {
     @PutMapping("/update-filter")
     @CrossOrigin("*")
     public ResponseEntity<String> updateVideoFilter(@RequestBody Map<String, String> requestBody) {
+        System.out.println("/update-filter 실행된다");
         String memberEmail = requestBody.get("memberEmail");
         String videoUrl = requestBody.get("videoUrl");
         String newFilter = requestBody.get("filter");
