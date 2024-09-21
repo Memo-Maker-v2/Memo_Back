@@ -86,7 +86,6 @@ public class PDFController {
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.APPLICATION_PDF);
       headers.setContentDispositionFormData("attachment", encodedFileName);
-      System.out.println("💨");
       return new ResponseEntity<>(fileResource, headers, HttpStatus.OK);
       
     } catch (IOException e) {
