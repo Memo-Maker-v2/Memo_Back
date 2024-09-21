@@ -81,7 +81,8 @@ public class PDFService {
               pdfDTO.getCategoryName(),
               pdfDTO.getFilter(),
               pdfDTO.getIsPublished(),
-              pdfDTO.getViewCount()
+              pdfDTO.getViewCount(),
+              pdfDTO.getThumbnailUrl() // thumbnail_url 반환
       );
     }
     // 중복되지 않은 경우 PDF 파일에서 텍스트 추출
@@ -120,7 +121,8 @@ public class PDFService {
             pdfDTO.getCategoryName(),
             pdfDTO.getFilter(),
             pdfDTO.getIsPublished(),
-            pdfDTO.getViewCount()
+            pdfDTO.getViewCount(),
+            pdfDTO.getThumbnailUrl() // thumbnail_url 반환
     );
   }
   
@@ -154,7 +156,8 @@ public class PDFService {
             pdfDTO.getCategoryName(),
             pdfDTO.getFilter(),
             pdfDTO.getIsPublished(),
-            pdfDTO.getViewCount()
+            pdfDTO.getViewCount(),
+            pdfDTO.getThumbnailUrl() // thumbnail_url 반환
     );
   }
   

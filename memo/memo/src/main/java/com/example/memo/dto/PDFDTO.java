@@ -7,11 +7,11 @@ import lombok.AllArgsConstructor;
 
 import java.util.Date;
 
-@Entity // JPA 엔티티임을 명시
-@Table(name = "pdf_table") // 데이터베이스 테이블 이름을 명시
-@Data // 롬복을 이용해 Getter, Setter, toString, EqualsAndHashCode 자동 생성
-@NoArgsConstructor // 기본 생성자 자동 생성
-@AllArgsConstructor // 모든 필드를 포함한 생성자 자동 생성
+@Entity
+@Table(name = "pdf_table")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PDFDTO {
   
   @Id
@@ -46,4 +46,7 @@ public class PDFDTO {
   
   @Column(name = "view_count")
   private Long viewCount;
+  
+  @Column(name = "thumbnail_url", length = 255)  // thumbnail_url 추가
+  private String thumbnailUrl;
 }
