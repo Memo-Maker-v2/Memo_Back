@@ -117,7 +117,7 @@ public class VideoService {
     public List<VideoDto> findVideosByMemberEmail(String memberEmail) {
         List<VideoEntity> videos = videoRepository.findByMemberEmail(memberEmail);
         return videos.stream()
-                .map(video -> new VideoDto(video.getVideoUrl(), video.getThumbnailUrl(), video.getVideoTitle(), video.getCategoryName()))
+                .map(VideoDto::new) // VideoEntity를 VideoDto로 변환
                 .collect(Collectors.toList());
     }
     // 비디오의 isPublished 값을 업데이트하는 메서드
