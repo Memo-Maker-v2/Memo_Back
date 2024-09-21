@@ -93,6 +93,7 @@ public class YoutubeService {
    */
   public YoutubeResponseDto processYoutubeUrl(String url, String memberEmail) throws IOException, JSONException {
     // URL이 'shorts' 형식이면 'watch?v=' 형식으로 변환
+    String youtubeUrl = url;
     if (url.contains("youtube.com/shorts/")) {
       url = url.replace("youtube.com/shorts/", "youtube.com/watch?v=");
     }
@@ -112,9 +113,9 @@ public class YoutubeService {
     
     try {
       // 중복 비디오 확인
-      if (isVideoDuplicate(url, memberEmail)) {
+      if (isVideoDuplicate(youtubeUrl, memberEmail)) {
         // 중복된 비디오 정보 가져오기
-        VideoEntity videoEntity = youtubeVideoRepository.findByMemberEmailAndVideoUrl(memberEmail, url);
+        VideoEntity videoEntity = youtubeVideoRepository.findByMemberEmailAndVideoUrl(memberEmail, youtubeUrl);
         if (videoEntity != null) {
           return new YoutubeResponseDto(
                   videoEntity.getVideoTitle(),
@@ -149,7 +150,7 @@ public class YoutubeService {
       VideoEntity videoEntity = new VideoEntity();
       videoEntity.setSummary(summary);
       videoEntity.setFullScript(fullScript);
-      videoEntity.setVideoUrl(url);
+      videoEntity.setVideoUrl(youtubeUrl);
       videoEntity.setThumbnailUrl(thumbnailUrl);
       videoEntity.setVideoTitle(videoTitle);
       videoEntity.setMemberEmail(memberEmail);
