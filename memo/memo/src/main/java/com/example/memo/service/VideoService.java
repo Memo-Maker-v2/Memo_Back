@@ -247,5 +247,13 @@ public class VideoService {
         videoEntity.setFullScript(newFullScript);
         videoRepository.save(videoEntity);
     }
+    // videoId로 비디오 조회
+    @Transactional(readOnly = true)
+    public VideoDto findVideoById(Long videoId) {
+        VideoEntity videoEntity = videoRepository.findById(videoId)
+                .orElseThrow(() -> new IllegalStateException("Video not found for the provided ID"));
+
+        return new VideoDto(videoEntity); // 모든 필드를 포함하는 생성자를 사용
+    }
 
 }
