@@ -39,7 +39,7 @@ public class VideoController {
         return videoService.saveVideo(videoDto);
     }
     //영상 클릭했을 때 영상 정보 불러옴
-    @PostMapping("select-video")
+    @PostMapping("/select-video")
     @CrossOrigin("*")
     public ResponseEntity<VideoAndQuestionDto> fetchVideoAndQuestions(@RequestBody VideoDto videoRequest) {
         try {
