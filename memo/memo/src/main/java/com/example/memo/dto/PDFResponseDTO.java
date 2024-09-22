@@ -36,6 +36,6 @@ public class PDFResponseDTO {
     this.filter = filter != null ? filter : "";
     this.isPublished = isPublished != null ? isPublished : false;
     this.viewCount = viewCount != null ? viewCount : 0L;
-    this.thumbnailUrl = thumbnailUrl != null ? thumbnailUrl : ""; // null일 경우 빈 문자열 처리
+    this.thumbnailUrl = thumbnailUrl != null ? thumbnailUrl : "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/640px-PDF_file_icon.svg.png"; // null일 경우 빈 문자열 처리
   }
 }
