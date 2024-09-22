@@ -1,7 +1,9 @@
 package com.example.memo.controller;
 
 import com.example.memo.dto.GPTQuestionDto;
+import com.example.memo.dto.PDFQuestionDto;
 import com.example.memo.service.GPTQuestionService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,5 +29,12 @@ public class GPTQuestionController {
     
     // GPT에게 질문을 보내고 답변을 받음
     return gptQuestionService.askQuestion(gptQuestionDto);
+  }
+
+  @PostMapping("/askPDF")
+  @CrossOrigin("*")
+  public String askPDFQuestion(@Valid @RequestBody PDFQuestionDto pdfQuestionDto) throws Exception {
+    // 검증된 PDF 질문을 GPT 서비스로 보내기
+    return gptQuestionService.askPDFQuestion(pdfQuestionDto);
   }
 }

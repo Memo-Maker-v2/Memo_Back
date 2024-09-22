@@ -2,6 +2,9 @@ package com.example.memo.service;
 
 import com.example.memo.common.OpenAIUtils;
 import com.example.memo.dto.GPTQuestionDto;
+import com.example.memo.dto.PDFQuestionDto;
+import com.example.memo.entity.PDFQuestionEntity;
+import com.example.memo.repository.PDFQuestionRepository;
 import okhttp3.*;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -12,10 +15,12 @@ import java.io.IOException;
 public class GPTQuestionService {
   
   private final OpenAIUtils openAIUtils;
+  private final PDFQuestionRepository pdfQuestionRepository;
   private static final String FLASK_API_URL = "http://localhost:8080/api/v1/questions/fetch-from-flask";
   
-  public GPTQuestionService(OpenAIUtils openAIUtils) {
+  public GPTQuestionService(OpenAIUtils openAIUtils, PDFQuestionRepository pdfQuestionRepository) {
     this.openAIUtils = openAIUtils;
+    this.pdfQuestionRepository = pdfQuestionRepository;
   }
   
   /**
@@ -73,6 +78,39 @@ public class GPTQuestionService {
       System.out.println("Successfully posted to Flask API. Response: " + response);
     } catch (IOException e) {
       System.err.println("IOException occurred while posting to Flask API: " + e.getMessage());
+      throw e;
+    }
+  }
+  
+  /**
+   * PDF 관련 질문에 대한 답변을 GPT API로부터 받고, 그 질문과 답변을 DB에 저장하는 메소드
+   *
+   * @param pdfQuestionDto PDF 질문 정보
+   * @return GPT API의 답변
+   * @throws Exception API 요청 실패 시
+   */
+  public String askPDFQuestion(PDFQuestionDto pdfQuestionDto) throws Exception {
+    try {
+      // GPT API에 질문을 보내고 답변을 받음
+      String answer = openAIUtils.askQuestion(pdfQuestionDto.getQuestion());
+      
+      // 받은 답변과 함께 PDF 질문을 DB에 저장
+      PDFQuestionEntity pdfQuestionEntity = new PDFQuestionEntity();
+      pdfQuestionEntity.setMemberEmail(pdfQuestionDto.getMemberEmail());
+      pdfQuestionEntity.setPdfTitle(pdfQuestionDto.getPdfTitle());
+      pdfQuestionEntity.setQuestion(pdfQuestionDto.getQuestion());
+      pdfQuestionEntity.setAnswer(answer);  // GPT로부터 받은 답변 저장
+      
+      // Repository를 이용해 DB에 저장
+      pdfQuestionRepository.save(pdfQuestionEntity);
+      
+      return answer;
+    } catch (IOException e) {
+      System.err.println("IOException during GPT API call: " + e.getMessage());
+      throw e;
+    } catch (Exception e) {
+      System.err.println("Unexpected exception: " + e.getMessage());
+      e.printStackTrace();
       throw e;
     }
   }
