@@ -86,7 +86,7 @@ public class VideoService {
             throw new IllegalStateException("Video not found for the provided email and URL");
         }
 
-        List<QuestionEntity> questions = questionRepository.findByVideoUrlAndMemberEmail(videoUrl, memberEmail);
+        List<QuestionEntity> questions = questionRepository.findByMemberEmailAndVideoUrl(memberEmail, videoUrl);
         List<QuestionDto> questionDtos = questions.stream()
                 .map(q -> new QuestionDto(q.getQuestion(), q.getAnswer(),q.getMemberEmail(),q.getVideoUrl()))
                 .collect(Collectors.toList());
