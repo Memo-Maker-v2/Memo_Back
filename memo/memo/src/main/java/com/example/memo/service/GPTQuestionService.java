@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 public class GPTQuestionService {
@@ -115,4 +116,15 @@ public class GPTQuestionService {
     }
   }
   
+  /**
+   * PDF 질문과 답변 기록을 DB에서 가져오는 메소드
+   *
+   * @param memberEmail 사용자의 이메일
+   * @param pdfTitle    PDF 제목
+   * @return PDF 질문과 답변 기록 목록
+   */
+  public List<PDFQuestionEntity> getPDFQuestionsAndAnswers(String memberEmail, String pdfTitle) {
+    // memberEmail과 pdfTitle로 데이터베이스에서 조회
+    return pdfQuestionRepository.findByMemberEmailAndPdfTitle(memberEmail, pdfTitle);
+  }
 }
