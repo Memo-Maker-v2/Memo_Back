@@ -18,6 +18,6 @@ public class QuestionController {
     @PostMapping("/fetch-from-flask")
     @CrossOrigin("*")
     public QuestionEntity saveQuestion(@RequestBody QuestionDto questionDto) throws Exception {
-        return questionService.saveQuestion(questionDto);
+        return questionService.saveOrUpdateQuestion(questionDto);
     }
 }
