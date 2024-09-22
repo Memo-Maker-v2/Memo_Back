@@ -91,7 +91,7 @@ public class VideoService {
                 .map(q -> new QuestionDto(q.getQuestion(), q.getAnswer(),q.getMemberEmail(),q.getVideoUrl()))
                 .collect(Collectors.toList());
 
-        VideoDto videoDto = new VideoDto(video.getVideoTitle(),video.getSummary(),video.getFullScript(), video.getVideoUrl(),video.getMemberEmail(), video.getDocumentDate(), video.getCategoryName());
+        VideoDto videoDto = new VideoDto(video.getVideoTitle(),video.getSummary(),video.getFullScript(), video.getVideoUrl(),video.getMemberEmail(), video.getDocumentDate(), video.getCategoryName(), video.getFilter() , video.getIsPublished(), video.getViewCount());
         return new VideoAndQuestionDto(videoDto, questionDtos);
     }
     // 비디오의 filter 정보를 업데이트하는 메서드
@@ -190,12 +190,14 @@ public class VideoService {
         if (videoEntity != null) {
             videoRepository.incrementViewCount(memberEmail, videoUrl);
             return new VideoDto(
-                    videoEntity.getVideoUrl(),
-                    videoEntity.getThumbnailUrl(),
                     videoEntity.getVideoTitle(),
+                    videoEntity.getSummary(),
+                    videoEntity.getFullScript(),
+                    videoEntity.getVideoUrl(),
+                    videoEntity.getMemberEmail(),
+                    videoEntity.getDocumentDate(),
                     videoEntity.getCategoryName(),
                     videoEntity.getFilter(),
-                    videoEntity.getDocumentDate(),
                     videoEntity.getIsPublished(),
                     videoEntity.getViewCount()
             );
