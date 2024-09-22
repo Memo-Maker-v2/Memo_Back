@@ -71,11 +71,9 @@ public class VideoController {
     @PutMapping("/update-filter")
     @CrossOrigin("*")
     public ResponseEntity<String> updateVideoFilter(@RequestBody Map<String, String> requestBody) {
-        System.out.println("/update-filter 실행된다");
         String memberEmail = requestBody.get("memberEmail");
         String videoUrl = requestBody.get("videoUrl");
         String newFilter = requestBody.get("filter");
-        System.out.println("memberEmail = " + memberEmail + ", videoUrl = " + videoUrl + ", newFilter = " + newFilter);
         if (memberEmail == null || videoUrl == null || newFilter == null) {
             return ResponseEntity.badRequest().body("Missing memberEmail, videoUrl, or filter");
         }
