@@ -14,8 +14,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PDFService {
@@ -168,6 +171,32 @@ public class PDFService {
     
     // PDF 파일 반환
     return new File(filePath);
+  }
+  
+  public List<PDFResponseDTO> getPDFsByMemberEmail(String memberEmail) {
+    // memberEmail로 PDF 리스트 조회
+    List<PDFDTO> pdfDTOs = pdfRepository.findByMemberEmail(memberEmail);
+    
+    // 비어 있는 경우 처리
+    if (pdfDTOs.isEmpty()) {
+      return Collections.emptyList(); // 빈 리스트 반환
+    }
+    
+    // PDFDTO를 PDFResponseDTO로 변환하여 반환
+    return pdfDTOs.stream()
+            .map(pdf -> new PDFResponseDTO(
+                    pdf.getPdfId(),
+                    pdf.getSummary(),
+                    pdf.getFullScript(),
+                    pdf.getPdfTitle(),
+                    pdf.getMemberEmail(),
+                    pdf.getDocumentDate(),
+                    pdf.getCategoryName(),
+                    pdf.getFilter(),
+                    pdf.getIsPublished(),
+                    pdf.getViewCount(),
+                    pdf.getThumbnailUrl()))
+            .collect(Collectors.toList());
   }
   
   

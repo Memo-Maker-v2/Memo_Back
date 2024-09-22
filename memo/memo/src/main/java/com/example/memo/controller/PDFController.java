@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/files")
@@ -92,6 +93,7 @@ public class PDFController {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
+  
   @PostMapping("/getpdfinfo")
   public ResponseEntity<PDFResponseDTO> getPDFInfo(
           @RequestBody PDFRequestDTO requestDTO) {
@@ -109,6 +111,28 @@ public class PDFController {
       return ResponseEntity.ok(pdfResponseDTO);
       
     } catch (IOException e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    }
+  }
+  
+  @PostMapping("/getpdfs")
+  public ResponseEntity<List<PDFResponseDTO>> getPDFsByMemberEmail(@RequestBody PDFRequestDTO requestDTO) {
+    try {
+      String memberEmail = requestDTO.getMemberEmail();
+      System.out.println("getpdfs memberEmail = " + memberEmail);
+      
+      // memberEmail로 PDF 리스트 조회
+      List<PDFResponseDTO> pdfResponseList = pdfService.getPDFsByMemberEmail(memberEmail);
+      
+      // 조회된 리스트가 비어 있으면 404 반환
+      if (pdfResponseList.isEmpty()) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+      }
+      
+      // 성공적으로 PDF 리스트 반환
+      return ResponseEntity.ok(pdfResponseList);
+      
+    } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
