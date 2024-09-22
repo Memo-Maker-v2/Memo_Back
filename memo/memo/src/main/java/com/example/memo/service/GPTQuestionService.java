@@ -50,12 +50,9 @@ public class GPTQuestionService {
   }
   
   private void postToFlask(String memberEmail, String videoUrl, String question, String answer) throws IOException {
-    System.out.println("memberEmail = " + memberEmail);
-    System.out.println("videoUrl = " + videoUrl);
-    System.out.println("answer = " + answer);
     OkHttpClient client = new OkHttpClient();
     MediaType mediaType = MediaType.parse("application/json");
-    
+    System.out.println("postToFlask 실행한다");
     JSONObject json = new JSONObject();
     json.put("memberEmail", memberEmail);
     json.put("videoUrl", videoUrl);
@@ -76,7 +73,7 @@ public class GPTQuestionService {
         System.err.println("Failed to send data to Flask API. Response: " + response);
         throw new IOException("Failed to send data to Flask API: " + response);
       }
-      System.out.println("Successfully posted to Flask API. Response: " + response);
+//      System.out.println("Successfully posted to Flask API. Response: " + response);
     } catch (IOException e) {
       System.err.println("IOException occurred while posting to Flask API: " + e.getMessage());
       throw e;

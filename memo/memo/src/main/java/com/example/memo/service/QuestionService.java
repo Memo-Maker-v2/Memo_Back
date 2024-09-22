@@ -10,6 +10,8 @@ import com.example.memo.repository.VideoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class QuestionService {
 
@@ -22,19 +24,18 @@ public class QuestionService {
         this.memberRepository = memberRepository;
         this.videoRepository = videoRepository;
     }
-
+    
     @Transactional
-    public QuestionEntity saveQuestion(QuestionDto questionDto) throws Exception {
+    public QuestionEntity saveOrUpdateQuestion(QuestionDto questionDto) throws Exception {
         String memberEmail = questionDto.getMemberEmail();  // DTO에서 값 추출
-        System.out.println("qmemberEmail = " + memberEmail);
+        System.out.println("saveOrUpdateQuestion qmemberEmail = " + memberEmail);
         if (memberEmail == null) {
             throw new IllegalArgumentException("Member email is missing in the request.");
         }
-
+        
         MemberEntity member = memberRepository.findByMemberEmail(memberEmail);  // 멤버 찾기
         if (member == null) {
-            /*throw new UserNotFoundException("User not found: " + memberEmail);  // 멤버가 없을 때 예외 처리*/
-            throw new Exception();
+            throw new Exception("User not found: " + memberEmail);  // 멤버가 없을 때 예외 처리
         }
         System.out.println("member = " + member);
         
@@ -44,20 +45,35 @@ public class QuestionService {
         }
         System.out.println("videoUrl = " + videoUrl);
         
-        System.out.println("videoRepository.findByVideoUrl(videoUrl)="+videoRepository.findByVideoUrl(videoUrl));
-        
-        VideoEntity video = videoRepository.findByVideoUrl(videoUrl);  // 비디오url 찾기
+        // 비디오를 찾기
+        VideoEntity video = videoRepository.findByMemberEmailAndVideoUrl(memberEmail, videoUrl);
         if (video == null) {
-            throw new Exception();
+            throw new Exception("Video not found for memberEmail: " + memberEmail + " and videoUrl: " + videoUrl);
         }
         System.out.println("video = " + video);
         
-        QuestionEntity questionEntity = new QuestionEntity();
-        questionEntity.setQuestion(questionDto.getQuestion());
-        questionEntity.setAnswer(questionDto.getAnswer());
-        questionEntity.setMemberEmail(questionDto.getMemberEmail());  // 외래 키 설정
-        questionEntity.setVideoUrl(questionDto.getVideoUrl());
-        System.out.println("questionEntity = " + questionEntity);
+        // 기존 질문이 있는지 확인
+        List<QuestionEntity> existingQuestions = questionRepository.findByMemberEmailAndVideoUrl(memberEmail, videoUrl);
+        QuestionEntity questionEntity;
+        
+        if (!existingQuestions.isEmpty()) {
+            // 질문이 있으면 업데이트
+            questionEntity = existingQuestions.get(0);
+            questionEntity.setQuestion(questionDto.getQuestion());
+            questionEntity.setAnswer(questionDto.getAnswer());
+            System.out.println("Question updated: " + questionEntity);
+        } else {
+            // 질문이 없으면 새로 추가
+            questionEntity = new QuestionEntity();
+            questionEntity.setQuestion(questionDto.getQuestion());
+            questionEntity.setAnswer(questionDto.getAnswer());
+            questionEntity.setMemberEmail(memberEmail);
+            questionEntity.setVideoUrl(videoUrl);
+            System.out.println("New question created: " + questionEntity);
+        }
+        
         return questionRepository.save(questionEntity);
     }
+    
+    
 }
