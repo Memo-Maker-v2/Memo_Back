@@ -1,12 +1,15 @@
+server:
+  port: 8080
+
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://awsmemodb.cz4coeuywybx.ap-northeast-2.rds.amazonaws.com:3306/memo?&serverTimezone=Asia/Seoul
-    username: root
-    password: memodbdb
-#    url: jdbc:mysql://localhost:3306/memo?&serverTimezone=Asia/Seoul
+#    url: jdbc:mysql://awsmemodb.cz4coeuywybx.ap-northeast-2.rds.amazonaws.com:3306/memo?&serverTimezone=Asia/Seoul
 #    username: root
-#    password: 1234
+#    password: memodbdb
+    url: jdbc:mysql://localhost:3306/memo?&serverTimezone=Asia/Seoul
+    username: root
+    password: 1234
   jpa:
     hibernate:
       ddl-auto: update
@@ -45,4 +48,4 @@ youtube:
     key: "AIzaSyBwTC375RADOCR3CNB5mtuaObkLyO9rPyY"
 openai:
   api:
-    key: "sk-None-3z2650cZGFBg7nVx79irT3BlbkFJSfz3zH3VBj39Zq6CNpY8"
+    key: "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"
